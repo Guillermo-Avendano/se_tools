@@ -1,0 +1,447 @@
+{
+  "name": "GFXUserAud2",
+  "version": "2.0",
+  "scope": "page",
+  "keepBlankRows": false,
+  "keepAnsiCCBlankRows": false,
+  "textOnlyMode": false,
+  "enableCalculatedFields": false,
+  "calculatedFields": null,
+  "rules": [
+    {
+      "name": "Header_1",
+      "type": "Region",
+      "ruleid": 1,
+      "mask": "",
+      "positionByMask": false,
+      "enabled": true,
+      "region": {
+        "position": {
+          "left": 9.13611,
+          "right": 9.70291,
+          "top": 0.30029,
+          "bottom": 0.44944
+        },
+        "stretchHeight": false,
+        "stretchWidth": false,
+        "startAnchor": null,
+        "endAnchor": null,
+        "wordSpacingThreshold": 57.0,
+        "lineSpacingThreshold": 35.0
+      },
+      "fields": [
+        {
+          "name": "FIELD_1_1",
+          "type": "date",
+          "levelType": "header1",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 1.0,
+              "right": 9.0,
+              "top": 0.0,
+              "bottom": 0.0
+            },
+            "format": "MM/DD/YYYY",
+            "terminator": null,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 1,
+            "display_length": 9,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "YYYYMMDD",
+            "changeCaseTo": "",
+            "removeSpaces": "B",
+            "padChar": "",
+            "minLength": 9,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        }
+      ]
+    },
+    {
+      "name": "Header_2",
+      "type": "Region",
+      "ruleid": 2,
+      "mask": "",
+      "positionByMask": false,
+      "enabled": true,
+      "region": {
+        "position": {
+          "left": 0.30417,
+          "right": 1.46111,
+          "top": 0.25142,
+          "bottom": 0.48417
+        },
+        "stretchHeight": false,
+        "stretchWidth": false,
+        "startAnchor": null,
+        "endAnchor": null,
+        "wordSpacingThreshold": 57.0,
+        "lineSpacingThreshold": 35.0
+      },
+      "fields": [
+        {
+          "name": "Header_2_1",
+          "type": "string",
+          "levelType": "header2",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 1.0,
+              "right": 7.0,
+              "top": 0.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "terminator": null,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 2,
+            "display_length": 7,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": true,
+            "useThousandSeparator": "O",
+            "lookupTable": [
+              {
+                "name": "ASGLookupTableDefault",
+                "value": "GFXUserAud"
+              }
+            ]
+          },
+          "dependencies": []
+        },
+        {
+          "name": "FIELD_1_2",
+          "type": "string",
+          "levelType": "header2",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 13.0,
+              "right": 13.0,
+              "top": 0.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "terminator": null,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "I",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 3,
+            "display_length": 1,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": true,
+            "useThousandSeparator": "O",
+            "lookupTable": [
+              {
+                "name": "ASGLookupTableDefault",
+                "value": "GFXUserAud"
+              }
+            ]
+          },
+          "dependencies": []
+        }
+      ]
+    },
+    {
+      "name": "Header_3",
+      "type": "Region",
+      "ruleid": 3,
+      "mask": "",
+      "positionByMask": false,
+      "enabled": true,
+      "region": {
+        "position": {
+          "left": 5.22083,
+          "right": 5.68008,
+          "top": 0.25142,
+          "bottom": 0.48417
+        },
+        "stretchHeight": false,
+        "stretchWidth": false,
+        "startAnchor": null,
+        "endAnchor": null,
+        "wordSpacingThreshold": 57.0,
+        "lineSpacingThreshold": 35.0
+      },
+      "fields": [
+        {
+          "name": "AssnNum",
+          "type": "string",
+          "levelType": "header3",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 1.0,
+              "right": 2.0,
+              "top": 0.0,
+              "bottom": 0.0
+            },
+            "format": "-#,###",
+            "terminator": null,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 4,
+            "display_length": 2,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": true,
+            "useThousandSeparator": "O",
+            "lookupTable": [
+              {
+                "name": "ASGLookupTableDefault",
+                "value": "Colonial"
+              }
+            ]
+          },
+          "dependencies": []
+        }
+      ]
+    }
+  ],
+  "fieldGroups": [
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Header_2",
+          "fieldName": "Header_2_1",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "REPORT_ID",
+      "usage": "1",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Header_1",
+          "fieldName": "FIELD_1_1",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "VERSION_ID",
+      "usage": "5",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Header_3",
+          "fieldName": "AssnNum",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "SECTION_ID",
+      "usage": "2",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Header_3",
+          "fieldName": "AssnNum",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "AgOrg",
+      "usage": "3",
+      "scope": "page",
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": false,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    }
+  ],
+  "pageBindInfo": {
+    "scaleFactorX": 1.0,
+    "scaleFactorY": 1.0,
+    "offsetX": 0.0,
+    "offsetY": 0.0
+  },
+  "ruleMatchLists": [],
+  "regionBindInfoList": [],
+  "sorts": [],
+  "defaultDateComponentOrder": "M/D/Y",
+  "cutoffForTwoDigitYear": 1950,
+  "documentInfo": {
+    "parsingInfo": {
+      "dataType": "PDF",
+      "charSet": null,
+      "pageBreak": null,
+      "lineBreak": null,
+      "jdlResource": null,
+      "jdeResource": null,
+      "useJslPageSettings": false,
+      "propagateTleRecords": false,
+      "externalResources": null,
+      "columnDelimiter": null,
+      "textEnclosure": null,
+      "alfFormat": 0,
+      "processHiddenText": false,
+      "useOCR": false,
+      "lastModified": "2026-02-15T03:49:13",
+      "filepath": "C:\\AgFirst\\AgCarolina\\GFX\\76 - GFX User Access Audit.PDF"
+    }
+  },
+  "description": "",
+  "metadataFields": {
+    "fields": [
+      {
+        "name": "FIELD_1",
+        "type": "string",
+        "levelType": "header1",
+        "metadataKey": "FILE_DIR2",
+        "allowBlank": true,
+        "useRetainedValue": false,
+        "isExternal": false,
+        "parsingInfo": {
+          "position": null,
+          "format": "",
+          "terminator": null,
+          "minValue": "",
+          "maxValue": "",
+          "matchValues": [],
+          "matchValuesUsage": "",
+          "useWildCard": false,
+          "discardIncompleteWords": false
+        },
+        "outputInfo": {
+          "hide": false,
+          "sequence": 0,
+          "display_length": 0,
+          "alignment": "L",
+          "date_pattern": 0,
+          "replacementValue": null,
+          "outputFormat": "",
+          "changeCaseTo": "",
+          "removeSpaces": "",
+          "padChar": "",
+          "minLength": 0,
+          "maxLength": 0,
+          "useLookupTable": false,
+          "useThousandSeparator": "O",
+          "lookupTable": null
+        },
+        "dependencies": []
+      }
+    ],
+    "values": [
+      {
+        "name": "FIELD_1",
+        "value": "AgCarolina"
+      }
+    ]
+  },
+  "compatibility": 0,
+  "xmlParentInfoList": []
+}

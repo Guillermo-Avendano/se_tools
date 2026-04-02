@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<VDRNET_DB_MASS_UPDATE VDRNET_VERSION="4.1">
+<RECIPIENT action="get" outAction="add/modify"/>
+<GROUP action="get" outAction="add/modify"/>
+<GROUP_MEMBERSHIP action="get" outAction="add/modify"/>
+<REPORT action="get" outAction="add/modify"/>
+<REPORT_ACCESS_RIGHTS action="get" outAction="add/modify"/>
+<TOPIC action="get" outAction="add/modify"/>
+<TOPIC_ACCESS_RIGHTS action="get" outAction="add/modify"/>
+<TOPIC_GROUP action="get" outAction="add/modify"/>
+<DEVICE action="get" outAction="add/modify"/>
+<PRINT_DISTRIBUTION_GROUP action="get" outAction="add/modify"/>
+<PRINT_COPY action="get" outAction="add/modify"/>
+<EMAIL_DISTRIBUTION_GROUP action="get" outAction="add/modify"/>
+<EMAIL_COPY action="get" outAction="add/modify"/>
+<POLICY action="get" outAction="add/modify"/>
+<POLICY_SELECTION_RULE action="get" outAction="add/modify"/>
+</VDRNET_DB_MASS_UPDATE>

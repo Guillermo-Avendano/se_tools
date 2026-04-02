@@ -1,0 +1,31 @@
+[
+  {
+    "id": "Insurance_IG03",
+    "name": "Claim Details",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "ClaimID",
+        "name": "Insurance - Claim ID",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "DoInClaim",
+        "name": "Insurance - Claim Date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": false,
+        "dataType": "Date",
+        "format": "MM/DD/YY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  }
+]

@@ -1,0 +1,404 @@
+{
+  "name": "GFXSecAuth",
+  "version": "3.0",
+  "scope": "page",
+  "keepBlankRows": false,
+  "keepAnsiCCBlankRows": false,
+  "textOnlyMode": false,
+  "enableCalculatedFields": false,
+  "calculatedFields": null,
+  "rules": [
+    {
+      "name": "Header_1",
+      "type": "Region",
+      "ruleid": 1,
+      "mask": "",
+      "positionByMask": false,
+      "enabled": true,
+      "region": {
+        "position": {
+          "left": 2.0,
+          "right": 6.61507,
+          "top": 0.61848086,
+          "bottom": 0.86236
+        },
+        "stretchHeight": false,
+        "stretchWidth": false,
+        "startAnchor": null,
+        "endAnchor": null,
+        "wordSpacingThreshold": 104.0,
+        "lineSpacingThreshold": 35.0
+      },
+      "fields": [
+        {
+          "name": "ReportID",
+          "type": "string",
+          "levelType": "header1",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 1.0,
+              "right": 32.0,
+              "top": 0.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "terminator": null,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 1,
+            "display_length": 32,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": true,
+            "useThousandSeparator": "O",
+            "lookupTable": [
+              {
+                "name": "GFX SecurityAccessRequest Form",
+                "value": "GFXSecAuth"
+              }
+            ]
+          },
+          "dependencies": []
+        }
+      ]
+    },
+    {
+      "name": "Header_2",
+      "type": "Region",
+      "ruleid": 2,
+      "mask": "",
+      "positionByMask": false,
+      "enabled": true,
+      "region": {
+        "position": {
+          "left": 0.89444,
+          "right": 1.6859,
+          "top": 10.04912,
+          "bottom": 10.1707
+        },
+        "stretchHeight": false,
+        "stretchWidth": false,
+        "startAnchor": null,
+        "endAnchor": null,
+        "wordSpacingThreshold": 39.0,
+        "lineSpacingThreshold": 35.0
+      },
+      "fields": [
+        {
+          "name": "FIELD_1_1",
+          "type": "date",
+          "levelType": "header2",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 1.0,
+              "right": 13.0,
+              "top": 0.0,
+              "bottom": 0.0
+            },
+            "format": "MMDDYY",
+            "terminator": null,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 2,
+            "display_length": 13,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "B",
+            "padChar": "",
+            "minLength": 13,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        }
+      ]
+    },
+    {
+      "name": "Header_3",
+      "type": "Region",
+      "ruleid": 3,
+      "mask": "",
+      "positionByMask": false,
+      "enabled": true,
+      "region": {
+        "position": {
+          "left": 1.89722,
+          "right": 5.24321,
+          "top": 1.33816,
+          "bottom": 1.54292
+        },
+        "stretchHeight": false,
+        "stretchWidth": false,
+        "startAnchor": null,
+        "endAnchor": null,
+        "wordSpacingThreshold": 48.0,
+        "lineSpacingThreshold": 35.0
+      },
+      "fields": [
+        {
+          "name": "Header_3_1",
+          "type": "string",
+          "levelType": "header3",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 1.0,
+              "right": 34.0,
+              "top": 0.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "terminator": null,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 3,
+            "display_length": 34,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": true,
+            "useThousandSeparator": "O",
+            "lookupTable": [
+              {
+                "name": "FC Central Florida",
+                "value": "Central Florida"
+              },
+              {
+                "name": "FC Central   Florida",
+                "value": "Central Florida"
+              }
+            ]
+          },
+          "dependencies": []
+        }
+      ]
+    }
+  ],
+  "fieldGroups": [
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Header_1",
+          "fieldName": "ReportID",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "REPORT_ID",
+      "usage": "1",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Metadata_fields",
+          "fieldName": "FileDate",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "VERSION_ID",
+      "usage": "5",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Header_3",
+          "fieldName": "Header_3_1",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "SECTION_ID",
+      "usage": "2",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Header_3",
+          "fieldName": "Header_3_1",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "AgOrg",
+      "usage": "3",
+      "scope": "page",
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": false,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    }
+  ],
+  "pageBindInfo": {
+    "scaleFactorX": 1.0,
+    "scaleFactorY": 1.0,
+    "offsetX": 0.0,
+    "offsetY": 0.0
+  },
+  "ruleMatchLists": [],
+  "regionBindInfoList": [],
+  "sorts": [],
+  "defaultDateComponentOrder": "M/D/Y",
+  "cutoffForTwoDigitYear": 1950,
+  "documentInfo": {
+    "parsingInfo": {
+      "dataType": "PDF",
+      "charSet": null,
+      "pageBreak": null,
+      "lineBreak": null,
+      "jdlResource": null,
+      "jdeResource": null,
+      "useJslPageSettings": false,
+      "propagateTleRecords": false,
+      "externalResources": null,
+      "columnDelimiter": null,
+      "textEnclosure": null,
+      "alfFormat": 0,
+      "processHiddenText": false,
+      "useOCR": false,
+      "lastModified": "2026-02-15T03:49:13",
+      "filepath": "C:\\AgFirst\\AgCarolina\\GFX\\76 - Security Request Authorization.PDF"
+    }
+  },
+  "description": "",
+  "metadataFields": {
+    "fields": [
+      {
+        "name": "FileDate",
+        "type": "string",
+        "levelType": "header1",
+        "metadataKey": "FILE_DATE",
+        "allowBlank": true,
+        "useRetainedValue": false,
+        "isExternal": false,
+        "parsingInfo": {
+          "position": null,
+          "format": "",
+          "terminator": null,
+          "minValue": "",
+          "maxValue": "",
+          "matchValues": [],
+          "matchValuesUsage": "",
+          "useWildCard": false,
+          "discardIncompleteWords": false
+        },
+        "outputInfo": {
+          "hide": false,
+          "sequence": 0,
+          "display_length": 0,
+          "alignment": "L",
+          "date_pattern": 0,
+          "replacementValue": null,
+          "outputFormat": "",
+          "changeCaseTo": "",
+          "removeSpaces": "",
+          "padChar": "",
+          "minLength": 0,
+          "maxLength": 0,
+          "useLookupTable": false,
+          "useThousandSeparator": "O",
+          "lookupTable": null
+        },
+        "dependencies": []
+      }
+    ],
+    "values": [
+      {
+        "name": "FileDate",
+        "value": "20260215"
+      }
+    ]
+  },
+  "compatibility": 0,
+  "xmlParentInfoList": []
+}

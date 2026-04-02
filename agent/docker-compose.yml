@@ -1,0 +1,58 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# This docker-compose is for LOCAL DEVELOPMENT ONLY.
+# For deployment, use deploy/docker-compose.yml which includes all services.
+#
+# Start with agent:  cd deploy && start.cmd agent
+# Start without:     cd deploy && start.cmd
+# ═══════════════════════════════════════════════════════════════════════════
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.13.2
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/localhost/6333' || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  agent-api:
+    build:
+      context: ..
+      dockerfile: agent/Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../deploy/workspace:/workspace
+    environment:
+      AGENT_WORKSPACE: /workspace
+      CE_WORK_DIR: /app/contentedge/files
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      qdrant:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  qdrant_data:
+  redis_data:

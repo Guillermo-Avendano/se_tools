@@ -1,0 +1,714 @@
+{
+  "name": "AP_AC2020_API",
+  "version": "3.0",
+  "scope": "page",
+  "keepBlankRows": false,
+  "keepAnsiCCBlankRows": true,
+  "textOnlyMode": false,
+  "enableCalculatedFields": false,
+  "calculatedFields": null,
+  "rules": [
+    {
+      "name": "DocInfo",
+      "type": "Region",
+      "ruleid": 1,
+      "mask": "",
+      "positionByMask": false,
+      "enabled": true,
+      "region": {
+        "position": {
+          "left": 0.0,
+          "right": 1.84615,
+          "top": 0.02778,
+          "bottom": 0.77389
+        },
+        "stretchHeight": false,
+        "stretchWidth": false,
+        "startAnchor": null,
+        "endAnchor": null,
+        "wordSpacingThreshold": 55.0,
+        "lineSpacingThreshold": 35.0
+      },
+      "fields": [
+        {
+          "name": "RPT_ID",
+          "type": "string",
+          "levelType": "header1",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 17.0,
+              "right": 22.0,
+              "top": 2.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "minLength": 6,
+            "maxLength": 6,
+            "terminator": null,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 0,
+            "display_length": 6,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        },
+        {
+          "name": "VER_ID",
+          "type": "date",
+          "levelType": "detail",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 1.0,
+              "right": 10.0,
+              "top": 1.0,
+              "bottom": 0.0
+            },
+            "format": "MM/DD/YYYY",
+            "minLength": 7,
+            "maxLength": 9,
+            "terminator": null,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 1,
+            "display_length": 10,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "YYYYMMDD",
+            "changeCaseTo": "",
+            "removeSpaces": "",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        },
+        {
+          "name": "SEC1",
+          "type": "string",
+          "levelType": "detail",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 17.0,
+              "right": 21.0,
+              "top": 3.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "minLength": 4,
+            "maxLength": 4,
+            "terminator": null,
+            "multiline": 2,
+            "useMultiline": false,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 2,
+            "display_length": 6,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        },
+        {
+          "name": "SEC2",
+          "type": "string",
+          "levelType": "detail",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 17.0,
+              "right": 19.0,
+              "top": 4.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "minLength": 2,
+            "maxLength": 2,
+            "terminator": null,
+            "multiline": 2,
+            "useMultiline": false,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 3,
+            "display_length": 7,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        },
+        {
+          "name": "SEC3",
+          "type": "string",
+          "levelType": "detail",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 17.0,
+              "right": 20.0,
+              "top": 5.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "minLength": 3,
+            "maxLength": 3,
+            "terminator": null,
+            "multiline": 2,
+            "useMultiline": false,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 4,
+            "display_length": 8,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        }
+      ]
+    },
+    {
+      "name": "AcctCode",
+      "type": "Region",
+      "ruleid": 2,
+      "mask": "",
+      "positionByMask": false,
+      "enabled": true,
+      "region": {
+        "position": {
+          "left": 0.0,
+          "right": 0.53793,
+          "top": 1.3848039,
+          "bottom": 7.1186557
+        },
+        "stretchHeight": false,
+        "stretchWidth": false,
+        "startAnchor": null,
+        "endAnchor": null,
+        "wordSpacingThreshold": 55.0,
+        "lineSpacingThreshold": 35.0
+      },
+      "fields": [
+        {
+          "name": "AC_Code",
+          "type": "string",
+          "levelType": "detail",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 1.0,
+              "right": 7.0,
+              "top": 0.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "minLength": 6,
+            "maxLength": 6,
+            "terminator": null,
+            "multiline": 2,
+            "useMultiline": false,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 5,
+            "display_length": 7,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "B",
+            "padChar": "",
+            "minLength": 7,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        }
+      ]
+    },
+    {
+      "name": "Details",
+      "type": "Region",
+      "ruleid": 3,
+      "mask": "",
+      "positionByMask": false,
+      "enabled": true,
+      "region": {
+        "position": {
+          "left": 1.76923,
+          "right": 4.52297,
+          "top": 0.33333,
+          "bottom": 0.80084854
+        },
+        "stretchHeight": false,
+        "stretchWidth": false,
+        "startAnchor": null,
+        "endAnchor": null,
+        "wordSpacingThreshold": 55.0,
+        "lineSpacingThreshold": 35.0
+      },
+      "fields": [
+        {
+          "name": "DEPT_DETAIL",
+          "type": "string",
+          "levelType": "header1",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 1.0,
+              "right": 0.0,
+              "top": 1.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "terminator": "|",
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 6,
+            "display_length": 8,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "B",
+            "padChar": "",
+            "minLength": 8,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        },
+        {
+          "name": "REGION_DETAIL",
+          "type": "string",
+          "levelType": "detail",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 1.0,
+              "right": 0.0,
+              "top": 2.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "terminator": "|",
+            "multiline": 2,
+            "useMultiline": false,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 7,
+            "display_length": 35,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "B",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        },
+        {
+          "name": "OFFICE_DETAIL",
+          "type": "string",
+          "levelType": "detail",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 0.0,
+              "right": 0.0,
+              "top": 3.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "terminator": "|",
+            "multiline": 2,
+            "useMultiline": false,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 8,
+            "display_length": 34,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "B",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        }
+      ]
+    }
+  ],
+  "fieldGroups": [
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "DocInfo",
+          "fieldName": "RPT_ID",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "REPORT_ID",
+      "usage": "1",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "DocInfo",
+          "fieldName": "VER_ID",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "VERSION_ID",
+      "usage": "5",
+      "scope": null,
+      "requiredOccurrence": "report",
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "DocInfo",
+          "fieldName": "SEC1",
+          "optional": false,
+          "hideDuplicateValues": false
+        },
+        {
+          "ruleName": "DocInfo",
+          "fieldName": "SEC2",
+          "optional": false,
+          "hideDuplicateValues": false
+        },
+        {
+          "ruleName": "DocInfo",
+          "fieldName": "SEC3",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "SECTION_ID",
+      "usage": "2",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "AcctCode",
+          "fieldName": "AC_Code",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "ACCode",
+      "usage": "3",
+      "scope": "page",
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": false,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Details",
+          "fieldName": "DEPT_DETAIL",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "ACDept",
+      "usage": "3",
+      "scope": "page",
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": false,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Details",
+          "fieldName": "REGION_DETAIL",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "ACRegion",
+      "usage": "3",
+      "scope": "page",
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": false,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Details",
+          "fieldName": "OFFICE_DETAIL",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "ACOffice",
+      "usage": "3",
+      "scope": "page",
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": false,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    }
+  ],
+  "pageBindInfo": {
+    "scaleFactorX": 1.0,
+    "scaleFactorY": 1.0,
+    "offsetX": 0.0,
+    "offsetY": 0.0
+  },
+  "ruleMatchLists": [],
+  "regionBindInfoList": [],
+  "sorts": [],
+  "defaultDateComponentOrder": "M/D/Y",
+  "cutoffForTwoDigitYear": 1980,
+  "documentInfo": {
+    "parsingInfo": {
+      "dataType": "Text",
+      "charSet": "ASCII",
+      "pageBreak": {
+        "type": "FORMFEED",
+        "fixedPageLength": 0,
+        "markers": null,
+        "columns": null
+      },
+      "lineBreak": {
+        "type": "CRLF",
+        "fixedLineLength": 0
+      },
+      "jdlResource": null,
+      "jdeResource": null,
+      "useJslPageSettings": false,
+      "propagateTleRecords": false,
+      "externalResources": null,
+      "columnDelimiter": null,
+      "textEnclosure": null,
+      "alfFormat": 0,
+      "processHiddenText": false,
+      "useOCR": false,
+      "lastModified": null,
+      "filepath": "ac2020_1.txt"
+    }
+  },
+  "description": "",
+  "metadataFields": {
+    "fields": [],
+    "values": []
+  },
+  "compatibility": 0,
+  "xmlParentInfoList": []
+}

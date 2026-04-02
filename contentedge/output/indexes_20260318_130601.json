@@ -1,0 +1,232 @@
+[
+  {
+    "id": "ACCode",
+    "name": "GL - Account Codes",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "AgOrg",
+    "name": "Agfirst - Organization Name",
+    "details": "Agfirst - Org Reports",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "AgfirstAsn",
+    "name": "Agfirst - Associations",
+    "details": "Folder for Agfirst Associations Reports.",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "BoardingDT",
+    "name": "Reservations by Boarding Date",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Date",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "CustID",
+    "name": "Financial - Customer ID",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "EmployeeID",
+    "name": "HR - Employee ID",
+    "details": "Internal ID used to identify an employee for HR",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "FDOCCLASS",
+    "name": "Walgreens - F_DOCCLASSNAME",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "F_DOCNUMBR",
+    "name": "Walgreens - F_DOCNUMBER",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Number",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "FirstName",
+    "name": "Walgreens - First Name",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "JOBNAME",
+    "name": "JCL SYSOUT - Job Logs",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": false,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "LPLAccount",
+    "name": "LPL - Account Number Lookup",
+    "details": "LPL Reports by Account Number",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "LPL_Order",
+    "name": "LPL - Order Number Lookup",
+    "details": "LPL Reports by Order Number",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Number",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "LPL_Sec",
+    "name": "LPL - Securities Activity Lookup",
+    "details": "LPL Reports by Securities code",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "LastName",
+    "name": "Walgreens - Last Name",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "PNR",
+    "name": "Reservations by  PNR",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "Pass_Name",
+    "name": "Reservations by Name",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": false,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "Pass_Name2",
+    "name": "Reservations by Name",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": false,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "PatientID",
+    "name": "HealthCare - Patient ID",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "SSN",
+    "name": "Walgreens -Social Security Number",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Number",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "TotAmnt",
+    "name": "Financial - Total Amount",
+    "details": "Total Amount of a Financial operation. Can be the Amount of an Invoice, Withdrawal, Deposit or a Payslip",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Number",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "WalLicLoc",
+    "name": "Walgreens - License Location",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "WalLicType",
+    "name": "Walgreens - License Type",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  },
+  {
+    "id": "WalState",
+    "name": "Walgreens - State",
+    "details": "",
+    "topicVersionDisplay": "All",
+    "allowAccess": true,
+    "dataType": "Character",
+    "maxLength": "30",
+    "category": "Document metadata"
+  }
+]

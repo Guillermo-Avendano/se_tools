@@ -1,0 +1,286 @@
+# ── Shared environment variables for all services ──
+x-ce-environment: &ce-environment
+  CE_SOURCE_REPO_URL: ${CE_SOURCE_REPO_URL:-}
+  CE_SOURCE_REPO_NAME: ${CE_SOURCE_REPO_NAME:-}
+  CE_SOURCE_REPO_USER: ${CE_SOURCE_REPO_USER:-}
+  CE_SOURCE_REPO_PASS: ${CE_SOURCE_REPO_PASS:-}
+  CE_SOURCE_REPO_SERVER_USER: ${CE_SOURCE_REPO_SERVER_USER:-}
+  CE_SOURCE_REPO_SERVER_PASS: ${CE_SOURCE_REPO_SERVER_PASS:-}
+  CE_SOURCE_CERT: ${CE_SOURCE_CERT:-/workspace/conf/cert_source/ca.crt}
+  CE_TARGET_REPO_URL: ${CE_TARGET_REPO_URL:-}
+  CE_TARGET_REPO_NAME: ${CE_TARGET_REPO_NAME:-}
+  CE_TARGET_REPO_USER: ${CE_TARGET_REPO_USER:-}
+  CE_TARGET_REPO_PASS: ${CE_TARGET_REPO_PASS:-}
+  CE_TARGET_REPO_SERVER_USER: ${CE_TARGET_REPO_SERVER_USER:-}
+  CE_TARGET_REPO_SERVER_PASS: ${CE_TARGET_REPO_SERVER_PASS:-}
+  CE_TARGET_CERT: ${CE_TARGET_CERT:-/workspace/conf/cert_target/ca.crt}
+
+services:
+  # ═══════════════════════════════════════════════════════════════
+  # SE ContentEdge Tools (Web UI + Backend)
+  # ═══════════════════════════════════════════════════════════════
+  web-app:
+    image: ${WEB_APP_IMAGE:-rocketsoftware2030/se-ce-tools:12.6.0}
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+      - "${API_PORT:-8500}:8500"
+    volumes:
+      - ./workspace:/workspace
+      - ${DATA_PATH:-./data}:/data
+    environment:
+      <<: *ce-environment
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8500/api/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+
+  # ═══════════════════════════════════════════════════════════════
+  # Workers (web_app image in worker mode)
+  # ═══════════════════════════════════════════════════════════════
+  worker-1:
+    image: ${WEB_APP_IMAGE:-rocketsoftware2030/se-ce-tools:12.6.0}
+    depends_on:
+      - web-app
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./workspace:/workspace
+      - ${DATA_PATH:-./data}:/data
+    environment:
+      <<: *ce-environment
+      WORKER: worker-1
+      DEBUG: false
+
+  worker-2:
+    image: ${WEB_APP_IMAGE:-rocketsoftware2030/se-ce-tools:12.6.0}
+    depends_on:
+      - web-app
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./workspace:/workspace
+      - ${DATA_PATH:-./data}:/data
+    environment:
+      <<: *ce-environment
+      WORKER: worker-2
+      DEBUG: false
+
+  worker-3:
+    image: ${WEB_APP_IMAGE:-rocketsoftware2030/se-ce-tools:12.6.0}
+    depends_on:
+      - web-app
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./workspace:/workspace
+      - ${DATA_PATH:-./data}:/data
+    environment:
+      <<: *ce-environment
+      WORKER: worker-3
+      DEBUG: ${DEBUG:-true}
+
+  # ═══════════════════════════════════════════════════════════════
+  # Agent Services (optional — activate with: --profile agent)
+  # docker compose --profile agent up -d
+  # ═══════════════════════════════════════════════════════════════
+
+  # ─── Qdrant (vector memory) ───
+  qdrant:
+    image: qdrant/qdrant:v1.13.2
+    restart: unless-stopped
+    profiles: ["agent"]
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/localhost/6333' || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ─── Redis (conversation history) ───
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    profiles: ["agent"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ─── llama.cpp model bootstrap (optional) ───
+  llama-cpp-models-init:
+    image: curlimages/curl:8.12.1
+    restart: "no"
+    profiles: ["llama_cpp"]
+    volumes:
+      - ./workspace/llamaccp/models:/models
+    environment:
+      LLAMA_CPP_CHAT_MODEL_FILE: ${LLAMA_CPP_CHAT_MODEL_FILE:-chat.gguf}
+      LLAMA_CPP_CHAT_MODEL_URL: ${LLAMA_CPP_CHAT_MODEL_URL:-}
+      LLAMA_CPP_EMBED_MODEL_FILE: ${LLAMA_CPP_EMBED_MODEL_FILE:-embed.gguf}
+      LLAMA_CPP_EMBED_MODEL_URL: ${LLAMA_CPP_EMBED_MODEL_URL:-}
+    command:
+      - /bin/sh
+      - -lc
+      - |
+        set -eu
+        mkdir -p /models
+        dl() {
+          file="$$1"
+          url="$$2"
+          if [ -f "/models/$$file" ]; then
+            echo "[llama-cpp-init] Found /models/$$file"
+            return 0
+          fi
+          if [ -z "$$url" ]; then
+            echo "[llama-cpp-init] Missing download URL for $$file"
+            exit 1
+          fi
+          echo "[llama-cpp-init] Downloading $$file"
+          curl -fL "$$url" -o "/models/$$file.part"
+          mv "/models/$$file.part" "/models/$$file"
+          echo "[llama-cpp-init] Downloaded /models/$$file"
+        }
+        dl "$$LLAMA_CPP_CHAT_MODEL_FILE" "$$LLAMA_CPP_CHAT_MODEL_URL"
+        dl "$$LLAMA_CPP_EMBED_MODEL_FILE" "$$LLAMA_CPP_EMBED_MODEL_URL"
+
+  # ─── llama.cpp chat server (optional) ───
+  llama-cpp-chat:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    restart: unless-stopped
+    profiles: ["llama_cpp"]
+    ports:
+      - "${LLAMA_CPP_CHAT_PORT:-8080}:8080"
+    volumes:
+      - ./workspace/llamaccp/models:/models
+    environment:
+      LLAMA_CPP_CHAT_MODEL_FILE: ${LLAMA_CPP_CHAT_MODEL_FILE:-chat.gguf}
+      LLAMA_CPP_N_CTX: ${LLAMA_CPP_N_CTX:-4096}
+      LLAMA_CPP_N_GPU_LAYERS: ${LLAMA_CPP_N_GPU_LAYERS:-0}
+    command:
+      - --model
+      - /models/${LLAMA_CPP_CHAT_MODEL_FILE:-chat.gguf}
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+      - --ctx-size
+      - ${LLAMA_CPP_N_CTX:-4096}
+      - --n-gpu-layers
+      - ${LLAMA_CPP_N_GPU_LAYERS:-0}
+    depends_on:
+      llama-cpp-models-init:
+        condition: service_completed_successfully
+
+  # ─── llama.cpp embeddings server (optional) ───
+  llama-cpp-embed:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    restart: unless-stopped
+    profiles: ["llama_cpp"]
+    ports:
+      - "${LLAMA_CPP_EMBED_PORT:-8081}:8080"
+    volumes:
+      - ./workspace/llamaccp/models:/models
+    environment:
+      LLAMA_CPP_EMBED_MODEL_FILE: ${LLAMA_CPP_EMBED_MODEL_FILE:-embed.gguf}
+      LLAMA_CPP_EMBED_N_CTX: ${LLAMA_CPP_EMBED_N_CTX:-2048}
+      LLAMA_CPP_N_GPU_LAYERS: ${LLAMA_CPP_N_GPU_LAYERS:-0}
+    command:
+      - --model
+      - /models/${LLAMA_CPP_EMBED_MODEL_FILE:-embed.gguf}
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+      - --ctx-size
+      - ${LLAMA_CPP_EMBED_N_CTX:-2048}
+      - --n-gpu-layers
+      - ${LLAMA_CPP_N_GPU_LAYERS:-0}
+      - --embedding
+    depends_on:
+      llama-cpp-models-init:
+        condition: service_completed_successfully
+
+  # ─── Agent API (AI agent with chat web UI) ───
+  agent-api:
+    image: ${SE_AGENT_IMAGE:-rocketsoftware2030/se-agent:1.0.0}
+    restart: unless-stopped
+    profiles: ["agent"]
+    env_file: .env
+    ports:
+      - "${AGENT_PORT:-8000}:8000"
+    volumes:
+      # Shared workspace — agent reads worker status, writes plan files
+      - ./workspace:/workspace
+    environment:
+      <<: *ce-environment
+      AGENT_WORKSPACE: /workspace
+      CE_WORK_DIR: /app/contentedge/files
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: "6333"
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-gpt-oss:latest}
+      OLLAMA_EMBED_MODEL: ${OLLAMA_EMBED_MODEL:-nomic-embed-text}
+      LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-ollama}
+      LLAMA_CPP_API_KEY: ${LLAMA_CPP_API_KEY:-}
+      LLAMA_CPP_MODEL: ${LLAMA_CPP_MODEL:-llama-3.1-8b-instruct}
+      LLAMA_CPP_BASE_URL: ${LLAMA_CPP_BASE_URL:-http://llama-cpp-chat:8080/v1}
+      LLAMA_CPP_TEMPERATURE: ${LLAMA_CPP_TEMPERATURE:-0.1}
+      LLAMA_CPP_EMBED_MODEL: ${LLAMA_CPP_EMBED_MODEL:-nomic-embed-text}
+      LLAMA_CPP_EMBED_BASE_URL: ${LLAMA_CPP_EMBED_BASE_URL:-http://llama-cpp-embed:8080/v1}
+      LLAMA_CPP_EMBED_API_KEY: ${LLAMA_CPP_EMBED_API_KEY:-}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:8000}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      qdrant:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  # ─── AnythingLLM (Chat Web UI) ───
+  anythingllm:
+    image: mintplexlabs/anythingllm:latest
+    restart: unless-stopped
+    profiles: ["agent"]
+    ports:
+      - "${ANYTHINGLLM_PORT:-3001}:3001"
+    environment:
+      STORAGE_DIR: /app/server/storage
+      LLM_PROVIDER: generic-openai
+      GENERIC_OPEN_AI_BASE_PATH: http://agent-api:8000/v1
+      GENERIC_OPEN_AI_MODEL_PREF: ${SE_AGENT_NAME:-Se-Agent}
+      GENERIC_OPEN_AI_TOKEN_LIMIT: 8192
+      # No API key needed — leave empty
+      GENERIC_OPEN_AI_API_KEY: sk-not-required
+    volumes:
+      - ./anythingllm/plugins:/app/server/storage/plugins
+    depends_on:
+      agent-api:
+        condition: service_healthy
+
+volumes:
+  qdrant_data:
+  redis_data:
+  anythingllm_storage:

@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SE ContentEdge Tools</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+</head>
+<body>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header class="app-header">
+    <div class="header-inner">
+        <div class="logo-area">
+            <img src="/rocket.svg" alt="Rocket Software" class="logo-img">
+            <span class="logo-divider"></span>
+            <span class="logo-product">ContentEdge Tools</span>
+        </div>
+        <nav class="header-nav">
+            <a href="#" class="nav-link active" data-tool="mrc">
+                <span class="material-icons-outlined">terminal</span>
+                MobiusRemoteCLI
+            </a>
+
+            <a href="#" class="nav-link" data-tool="create-policy">
+                <span class="material-icons-outlined">policy</span>
+                Create Archiving Policies
+            </a>
+            <a href="#" class="nav-link" data-tool="remove-defs">
+                <span class="material-icons-outlined">delete_sweep</span>
+                Remove Definitions
+            </a>
+            <a href="#" class="nav-link" data-tool="workers">
+                <span class="material-icons-outlined">terminal</span>
+                Workers
+            </a>
+            <a href="#" class="nav-link nav-agent-link" data-agent-shortcut="true" title="Open Agent Chat">
+                <span class="material-icons-outlined">smart_toy</span>
+                Ask Agent
+            </a>
+        </nav>
+    </div>
+</header>
+
+<!-- ═══════════════════ REPO INFO BAR ═══════════════════ -->
+<div class="repo-info-bar" id="repo-info-bar">
+    <div class="repo-info-inner">
+        <div class="repo-info-item">
+            <span class="repo-info-label">SOURCE</span>
+            <span class="repo-info-url" id="repo-info-source-url">—</span>
+            <span class="repo-info-name" id="repo-info-source-name"></span>
+        </div>
+        <div class="repo-info-divider"></div>
+        <div class="repo-info-item">
+            <span class="repo-info-label repo-info-label--target">TARGET</span>
+            <span class="repo-info-url" id="repo-info-target-url">—</span>
+            <span class="repo-info-name" id="repo-info-target-name"></span>
+        </div>
+    </div>
+</div>
+
+<!-- ╔═══════════════════════════════════════════════════════════════════════╗
+     ║  TOOL 1: CREATE ARCHIVING POLICIES                                 ║
+     ╚═══════════════════════════════════════════════════════════════════════╝ -->
+<div class="tool-container" id="tool-create-policy">
+
+    <!-- Stepper -->
+    <div class="stepper-bar">
+        <div class="stepper-inner">
+            <div class="step active" data-step="1">
+                <div class="step-circle">1</div>
+                <span class="step-label">Define Fields</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="2">
+                <div class="step-circle">2</div>
+                <span class="step-label">Verify Extraction</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="3">
+                <div class="step-circle">3</div>
+                <span class="step-label">SECTION & VERSION</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="4">
+                <div class="step-circle">4</div>
+                <span class="step-label">Name & Generate</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="5">
+                <div class="step-circle">5</div>
+                <span class="step-label">Publish</span>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <!-- ── STEP 1: Define Fields ── -->
+        <section class="step-panel active" id="step-1">
+            <div class="split-layout">
+                <div class="panel-left">
+                    <div class="card">
+                        <h3 class="card-title">
+                            <span class="material-icons-outlined">upload_file</span>
+                            Source File
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label">Folder</label>
+                            <div class="file-selector">
+                                <select id="cp-folder-select" class="form-select">
+                                    <option value="">— Select a folder —</option>
+                                </select>
+                                <button class="btn btn-outline btn-sm" id="btn-refresh-files" title="Refresh">
+                                    <span class="material-icons-outlined">refresh</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">File</label>
+                            <select id="file-select" class="form-select">
+                                <option value="">— Select a folder first —</option>
+                            </select>
+                        </div>
+                        <label class="asa-check"><input type="checkbox" id="cp-asa-check"> ASA carriage control</label>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">
+                            <span class="material-icons-outlined">text_fields</span>
+                            Field Definitions
+                        </h3>
+                        <div id="field-list" class="field-list"></div>
+                        <button id="btn-add-field" class="btn btn-secondary btn-sm" type="button">
+                            <span class="material-icons-outlined">add_circle_outline</span>
+                            Add Field
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-right">
+                    <div class="card file-viewer-card">
+                        <div class="file-viewer-toolbar">
+                            <h3 class="card-title">
+                                <span class="material-icons-outlined">description</span>
+                                File Preview
+                            </h3>
+                            <div class="page-nav" id="page-nav" style="display:none">
+                                <button class="btn btn-icon" id="btn-prev-page" title="Previous page">
+                                    <span class="material-icons-outlined">chevron_left</span>
+                                </button>
+                                <span id="page-indicator">Page 1 / 1</span>
+                                <button class="btn btn-icon" id="btn-next-page" title="Next page">
+                                    <span class="material-icons-outlined">chevron_right</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="file-viewer-wrapper">
+                            <div class="column-ruler" id="column-ruler"></div>
+                            <div class="file-viewer" id="file-viewer">
+                                <div class="placeholder-text">
+                                    <span class="material-icons-outlined" style="font-size:48px;opacity:0.3">insert_drive_file</span>
+                                    <p>Select a file to preview</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="file-viewer-status" id="viewer-status"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="step-actions">
+                <div></div>
+                <button class="btn btn-primary" id="btn-step1-next">
+                    Extract & Verify
+                    <span class="material-icons-outlined">arrow_forward</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ── STEP 2: Verify Extraction ── -->
+        <section class="step-panel" id="step-2">
+            <div class="card">
+                <h3 class="card-title">
+                    <span class="material-icons-outlined">fact_check</span>
+                    Extracted Values (First 3 Pages)
+                </h3>
+                <p class="card-desc">Review the values extracted from the file. If any are incorrect, go back and adjust positions.</p>
+                <div class="table-container">
+                    <table class="data-table" id="extraction-table">
+                        <thead>
+                            <tr><th>Field</th><th>Position</th><th>Format</th><th>Page 1</th><th>Page 2</th><th>Page 3</th><th>Status</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="step-actions">
+                <button class="btn btn-secondary" id="btn-step2-back">
+                    <span class="material-icons-outlined">arrow_back</span> Back
+                </button>
+                <button class="btn btn-primary" id="btn-step2-next">
+                    Define Mapping <span class="material-icons-outlined">arrow_forward</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ── STEP 3: SECTION & VERSION ── -->
+        <section class="step-panel" id="step-3">
+            <div class="two-col-cards">
+                <div class="card">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">view_column</span> SECTION Mapping
+                    </h3>
+                    <p class="card-desc">Select one or more fields to compose the <strong>SECTION</strong> identifier.</p>
+                    <div id="section-field-list" class="mapping-list"></div>
+                    <div class="mapping-preview" id="section-preview"></div>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">schedule</span> VERSION Mapping
+                    </h3>
+                    <p class="card-desc">Select the field used as <strong>VERSION</strong> identifier (typically a date).</p>
+                    <div id="version-field-list" class="mapping-list"></div>
+                    <div class="mapping-preview" id="version-preview"></div>
+                </div>
+            </div>
+            <div class="step-actions">
+                <button class="btn btn-secondary" id="btn-step3-back">
+                    <span class="material-icons-outlined">arrow_back</span> Back
+                </button>
+                <button class="btn btn-primary" id="btn-step3-next">
+                    Name & Register <span class="material-icons-outlined">arrow_forward</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ── STEP 4: Name & Generate ── -->
+        <section class="step-panel" id="step-4">
+            <div class="card" style="max-width:600px">
+                <h3 class="card-title">
+                    <span class="material-icons-outlined">badge</span> Policy Name
+                </h3>
+                <div class="form-group">
+                    <label for="policy-name" class="form-label">Archiving Policy Name</label>
+                    <input type="text" id="policy-name" class="form-input" placeholder="e.g. AP_AC2020"
+                           maxlength="64" pattern="[A-Za-z0-9_\-]+">
+                </div>
+                <div class="form-group">
+                    <label for="content-class" class="form-label">Content Class (optional)</label>
+                    <input type="text" id="content-class" class="form-input" placeholder="e.g. AC2020">
+                </div>
+                <div class="summary-box" id="policy-summary"></div>
+            </div>
+            <div class="step-actions">
+                <button class="btn btn-secondary" id="btn-step4-back">
+                    <span class="material-icons-outlined">arrow_back</span> Back
+                </button>
+                <button class="btn btn-primary btn-lg" id="btn-generate">
+                    <span class="material-icons-outlined">save</span> Generate Policy
+                </button>
+            </div>
+            <div class="result-banner" id="result-banner" style="display:none">
+                <div class="result-content">
+                    <span class="material-icons-outlined result-icon" id="result-icon">check_circle</span>
+                    <div>
+                        <strong id="result-title">Policy Generated</strong>
+                        <p id="result-message"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── STEP 5: Publish ── -->
+        <section class="step-panel" id="step-5">
+            <div class="card">
+                <h3 class="card-title">
+                    <span class="material-icons-outlined">cloud_upload</span> Publish to Repository
+                </h3>
+                <p class="card-desc">Select a generated policy JSON and a target repository to publish.</p>
+                <div class="form-group">
+                    <label class="form-label">Generated Policy</label>
+                    <div class="file-selector">
+                        <select id="pub-policy-select" class="form-select">
+                            <option value="">Loading…</option>
+                        </select>
+                        <button class="btn btn-outline btn-sm" id="btn-pub-refresh" title="Refresh">
+                            <span class="material-icons-outlined">refresh</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Repository</label>
+                    <select id="pub-repo-select" class="form-select">
+                        <option value="source">SOURCE</option>
+                    </select>
+                </div>
+                <div id="pub-status" style="margin-top:var(--space-sm)"></div>
+            </div>
+            <div class="step-actions">
+                <button class="btn btn-secondary" id="btn-step5-back">
+                    <span class="material-icons-outlined">arrow_back</span> Back
+                </button>
+                <button class="btn btn-primary btn-lg" id="btn-publish">
+                    <span class="material-icons-outlined">cloud_upload</span> Publish
+                </button>
+            </div>
+            <div class="result-banner" id="pub-result-banner" style="display:none">
+                <div class="result-content">
+                    <span class="material-icons-outlined result-icon" id="pub-result-icon">check_circle</span>
+                    <div>
+                        <strong id="pub-result-title">Published</strong>
+                        <p id="pub-result-message"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- ╔═══════════════════════════════════════════════════════════════════════╗
+     ║  TOOL 2: MobiusRemoteCLI                                           ║
+     ╚═══════════════════════════════════════════════════════════════════════╝ -->
+<div class="tool-container active" id="tool-mrc">
+
+    <!-- Top bar: Repo + Worker + Operation selectors -->
+    <div class="mrc-top-bar">
+        <div class="mrc-top-inner">
+            <div class="mrc-selector-group">
+                <label class="mrc-label">Repository</label>
+                <div class="mrc-repo-btns">
+                    <button class="btn btn-outline btn-sm mrc-repo-btn" id="mrc-btn-source" disabled>SOURCE</button>
+                    <button class="btn btn-outline btn-sm mrc-repo-btn" id="mrc-btn-target" disabled>TARGET</button>
+                </div>
+            </div>
+            <div class="mrc-selector-group">
+                <label class="mrc-label">Worker</label>
+                <select id="mrc-worker-select" class="form-select" style="min-width:160px">
+                    <option value="">— Select worker —</option>
+                </select>
+            </div>
+            <div class="mrc-selector-group">
+                <label class="mrc-label">Operation</label>
+                <div class="mrc-op-btns">
+                    <button class="btn btn-outline btn-sm mrc-op-btn" data-op="adelete">adelete</button>
+                    <button class="btn btn-outline btn-sm mrc-op-btn" data-op="acreate">acreate</button>
+                    <button class="btn btn-outline btn-sm mrc-op-btn" data-op="vdrdbxml">vdrdbxml</button>
+                </div>
+            </div>
+            <div style="flex:1"></div>
+            <button class="btn btn-outline btn-sm" id="btn-mrc-refresh" title="Refresh workers & repos">
+                <span class="material-icons-outlined">refresh</span>
+            </button>
+        </div>
+    </div>
+
+    <main class="main-content">
+
+        <!-- ── Placeholder when no operation selected ── -->
+        <section id="mrc-placeholder" class="mrc-placeholder-section">
+            <div class="placeholder-text" style="padding:60px 0">
+                <span class="material-icons-outlined" style="font-size:64px;opacity:0.2">terminal</span>
+                <p style="margin-top:12px;color:var(--gray-500)">Select a repository, worker, and operation to begin.</p>
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             ADELETE operation panel
+             ══════════════════════════════════════════════════════════════ -->
+        <section id="mrc-adelete-panel" class="mrc-op-panel" style="display:none">
+            <div class="mrc-split-layout">
+                <!-- Left: Content Classes table with checkboxes -->
+                <div class="card mrc-cc-list-card">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">class</span>
+                        Content Classes
+                        <span class="migrate-count" id="mrc-adelete-cc-count" style="margin-left:auto">0</span>
+                    </h3>
+                    <div class="table-container" style="max-height:calc(100vh - 340px);overflow-y:auto">
+                        <table class="data-table compact" id="mrc-adelete-cc-table">
+                            <thead><tr><th style="width:32px"><input type="checkbox" class="mrc-adelete-select-all"></th><th>Name</th></tr></thead>
+                            <tbody><tr><td colspan="2" class="muted">Select a repository first</td></tr></tbody>
+                        </table>
+                    </div>
+                    <div class="step-actions" style="margin-top:var(--space-md)">
+                        <button class="btn btn-outline btn-sm" id="btn-mrc-adelete-add-selected" disabled>
+                            <span class="material-icons-outlined">add</span> Add Selected
+                        </button>
+                    </div>
+                </div>
+                <!-- Right: Plan table + command preview -->
+                <div class="card" style="flex:2;display:flex;flex-direction:column">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">list_alt</span>
+                        Plan — adelete
+                    </h3>
+
+                    <!-- Command template (editable) -->
+                    <div class="form-group" style="margin-bottom:var(--space-md)">
+                        <label class="form-label">Command Template <span class="muted" style="font-weight:normal">(editable — {CONTENT_CLASS} will be replaced per row)</span></label>
+                        <textarea id="mrc-adelete-cmd-template" class="form-input" rows="2"
+                            style="font-family:var(--font-mono);font-size:13px;resize:vertical"
+                            spellcheck="false"></textarea>
+                    </div>
+
+                    <div class="table-container" style="flex:1;max-height:calc(100vh - 480px);overflow-y:auto">
+                        <table class="data-table compact" id="mrc-adelete-plan-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px">#</th>
+                                    <th>Content Class</th>
+                                    <th>Command</th>
+                                    <th style="width:50px"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="4" class="muted">Click content classes on the left to add them to the plan</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="step-actions" style="margin-top:var(--space-md)">
+                        <span class="muted" id="mrc-adelete-plan-count">0 items in plan</span>
+                        <button class="btn btn-primary" id="btn-mrc-adelete-submit" disabled>
+                            <span class="material-icons-outlined">send</span> Submit Plan
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="result-banner" id="mrc-adelete-result-banner" style="display:none">
+                <div class="result-content">
+                    <span class="material-icons-outlined result-icon" id="mrc-adelete-result-icon">check_circle</span>
+                    <div>
+                        <strong id="mrc-adelete-result-title"></strong>
+                        <p id="mrc-adelete-result-message"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             ACREATE operation panel
+             ══════════════════════════════════════════════════════════════ -->
+        <section id="mrc-acreate-panel" class="mrc-op-panel" style="display:none">
+            <!-- Mode toggle: Policy vs List -->
+            <div style="display:flex;gap:8px;margin-bottom:var(--space-md)">
+                <button class="btn btn-outline btn-sm mrc-ac-mode-btn active" data-mode="policy" onclick="mrcAcreateSetMode('policy')">
+                    <span class="material-icons-outlined" style="font-size:16px">policy</span> Policy
+                </button>
+                <button class="btn btn-outline btn-sm mrc-ac-mode-btn" data-mode="list" onclick="mrcAcreateSetMode('list')">
+                    <span class="material-icons-outlined" style="font-size:16px">format_list_bulleted</span> List
+                </button>
+            </div>
+
+            <div class="mrc-split-layout">
+                <!-- Left: Collapsible selectors -->
+                <div class="card mrc-cc-list-card">
+
+                    <!-- ── POLICY MODE selectors ── -->
+                    <div id="mrc-ac-policy-mode-selectors">
+                        <!-- Content Class selector -->
+                        <div class="mrc-collapsible-section" id="mrc-ac-cc-section">
+                            <div class="mrc-collapsible-header" id="mrc-ac-cc-header">
+                                <span class="material-icons-outlined" style="font-size:18px">class</span>
+                                <span class="mrc-collapsible-title">Content Class</span>
+                                <span class="mrc-collapsible-value" id="mrc-ac-cc-value"></span>
+                                <span class="material-icons-outlined mrc-collapsible-arrow">expand_more</span>
+                            </div>
+                            <div class="mrc-collapsible-body open" id="mrc-ac-cc-body">
+                                <div id="mrc-ac-cc-list" class="mrc-cc-list" style="max-height:220px;overflow-y:auto">
+                                    <div class="muted text-center" style="padding:16px">Select a repository first</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Archiving Policy selector -->
+                        <div class="mrc-collapsible-section" id="mrc-ac-policy-section">
+                            <div class="mrc-collapsible-header" id="mrc-ac-policy-header">
+                                <span class="material-icons-outlined" style="font-size:18px">policy</span>
+                                <span class="mrc-collapsible-title">Archiving Policy</span>
+                                <span class="mrc-collapsible-value" id="mrc-ac-policy-value"></span>
+                                <span class="material-icons-outlined mrc-collapsible-arrow">expand_more</span>
+                            </div>
+                            <div class="mrc-collapsible-body" id="mrc-ac-policy-body">
+                                <div id="mrc-ac-policy-list" class="mrc-cc-list" style="max-height:220px;overflow-y:auto">
+                                    <div class="muted text-center" style="padding:16px">Select a content class first</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Folder selector (Policy mode) -->
+                        <div class="mrc-collapsible-section" id="mrc-ac-folder-section">
+                            <div class="mrc-collapsible-header" id="mrc-ac-folder-header">
+                                <span class="material-icons-outlined" style="font-size:18px">folder_open</span>
+                                <span class="mrc-collapsible-title">Source Folder</span>
+                                <span class="mrc-collapsible-value" id="mrc-ac-folder-value"></span>
+                                <span class="material-icons-outlined mrc-collapsible-arrow">expand_more</span>
+                            </div>
+                            <div class="mrc-collapsible-body" id="mrc-ac-folder-body">
+                                <div id="mrc-ac-folder-list" class="mrc-cc-list" style="max-height:400px;overflow-y:auto">
+                                    <div class="muted text-center" style="padding:16px">Select a policy first</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── LIST MODE selectors ── -->
+                    <div id="mrc-ac-list-mode-selectors" style="display:none">
+                        <!-- File filter -->
+                        <div style="padding:8px 12px">
+                            <label class="form-label" style="font-size:12px;margin-bottom:4px">File Filter</label>
+                            <input type="text" id="mrc-ac-list-filter" class="form-input" value="*.lst"
+                                placeholder="e.g. *.lst, *.txt" style="font-family:var(--font-mono);font-size:13px">
+                        </div>
+
+                        <!-- Folder browser (List mode) -->
+                        <div class="mrc-collapsible-section" id="mrc-ac-list-folder-section">
+                            <div class="mrc-collapsible-header" id="mrc-ac-list-folder-header">
+                                <span class="material-icons-outlined" style="font-size:18px">folder_open</span>
+                                <span class="mrc-collapsible-title">Source Folder</span>
+                                <span class="mrc-collapsible-value" id="mrc-ac-list-folder-value"></span>
+                                <span class="material-icons-outlined mrc-collapsible-arrow">expand_less</span>
+                            </div>
+                            <div class="mrc-collapsible-body open" id="mrc-ac-list-folder-body">
+                                <div id="mrc-ac-list-folder-list" class="mrc-cc-list" style="max-height:400px;overflow-y:auto">
+                                    <div class="muted text-center" style="padding:16px">Loading folders…</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding:8px;text-align:center">
+                        <button class="btn btn-primary btn-sm" id="btn-mrc-ac-generate" disabled>
+                            <span class="material-icons-outlined" style="font-size:16px">playlist_add</span>
+                            Add Files to Plan
+                        </button>
+                    </div>
+                    <!-- LST Validation Report (list mode) -->
+                    <div id="mrc-ac-lst-validation" style="display:none;padding:8px 12px;max-height:260px;overflow-y:auto"></div>
+                </div>
+
+                <!-- Right: Command template + plan table -->
+                <div class="card" style="flex:2;display:flex;flex-direction:column">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">list_alt</span>
+                        Plan — acreate
+                    </h3>
+
+                    <!-- Command template (editable) -->
+                    <div class="form-group" style="margin-bottom:var(--space-md)">
+                        <label class="form-label" id="mrc-acreate-template-label">Command Template <span class="muted" style="font-weight:normal">({FILE_PATH}, {CONTENT_CLASS}, {POLICY_NAME} replaced per row)</span></label>
+                        <textarea id="mrc-acreate-cmd-template" class="form-input" rows="2"
+                            style="font-family:var(--font-mono);font-size:13px;resize:vertical"
+                            spellcheck="false"></textarea>
+                    </div>
+
+                    <div class="table-container" style="flex:1;max-height:calc(100vh - 480px);overflow-y:auto">
+                        <table class="data-table compact" id="mrc-acreate-plan-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px">#</th>
+                                    <th>File</th>
+                                    <th>Command</th>
+                                    <th style="width:50px"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="4" class="muted">Select Content Class, Policy, and Folder to generate plan</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="step-actions" style="margin-top:var(--space-md)">
+                        <span class="muted" id="mrc-acreate-plan-count">0 items in plan</span>
+                        <button class="btn btn-primary" id="btn-mrc-acreate-submit" disabled>
+                            <span class="material-icons-outlined">send</span> Submit Plan
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="result-banner" id="mrc-acreate-result-banner" style="display:none">
+                <div class="result-content">
+                    <span class="material-icons-outlined result-icon" id="mrc-acreate-result-icon">check_circle</span>
+                    <div>
+                        <strong id="mrc-acreate-result-title"></strong>
+                        <p id="mrc-acreate-result-message"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             VDRDBXML operation panel
+             ══════════════════════════════════════════════════════════════ -->
+        <section id="mrc-vdrdbxml-panel" class="mrc-op-panel" style="display:none">
+            <div class="mrc-split-layout">
+                <!-- Left: Mode + Selection -->
+                <div class="card mrc-cc-list-card">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">storage</span>
+                        vdrdbxml
+                    </h3>
+
+                    <!-- Mode selector -->
+                    <div style="padding:8px 12px">
+                        <label class="form-label" style="font-size:12px;margin-bottom:4px">Mode</label>
+                        <div style="display:flex;gap:6px">
+                            <button class="btn btn-outline btn-sm mrc-vdr-mode-btn active" data-mode="all" onclick="mrcVdrSelectMode('all')">All Definitions</button>
+                            <button class="btn btn-outline btn-sm mrc-vdr-mode-btn" data-mode="specific" onclick="mrcVdrSelectMode('specific')">Specific</button>
+                        </div>
+                    </div>
+
+                    <!-- Direction selector -->
+                    <div style="padding:8px 12px">
+                        <label class="form-label" style="font-size:12px;margin-bottom:4px">Direction</label>
+                        <div style="display:flex;gap:6px">
+                            <button class="btn btn-outline btn-sm mrc-vdr-dir-btn active" data-dir="export-import" onclick="mrcVdrSelectDir('export-import')">Export + Import</button>
+                            <button class="btn btn-outline btn-sm mrc-vdr-dir-btn" data-dir="export" onclick="mrcVdrSelectDir('export')">Export Only</button>
+                            <button class="btn btn-outline btn-sm mrc-vdr-dir-btn" data-dir="import" onclick="mrcVdrSelectDir('import')">Import Only</button>
+                        </div>
+                    </div>
+
+                    <!-- Import-only file browser (hidden by default) -->
+                    <div id="mrc-vdr-import-panel" style="display:none">
+                        <!-- Folder browser -->
+                        <div class="mrc-collapsible-section">
+                            <div class="mrc-collapsible-header" onclick="mrcVdrToggleImportSection('folder')">
+                                <span class="material-icons-outlined" style="font-size:18px">folder_open</span>
+                                <span class="mrc-collapsible-title">Browse Folders</span>
+                                <span class="mrc-collapsible-value" id="mrc-vdr-import-folder-value"></span>
+                                <span class="material-icons-outlined mrc-collapsible-arrow">expand_less</span>
+                            </div>
+                            <div class="mrc-collapsible-body open" id="mrc-vdr-import-folder-body">
+                                <div id="mrc-vdr-import-folder-list" class="mrc-cc-list" style="max-height:260px;overflow-y:auto">
+                                    <div class="muted text-center" style="padding:16px">Loading folders…</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- XML file list for selected folder -->
+                        <div class="mrc-collapsible-section">
+                            <div class="mrc-collapsible-header" onclick="mrcVdrToggleImportSection('file')">
+                                <span class="material-icons-outlined" style="font-size:18px">description</span>
+                                <span class="mrc-collapsible-title">XML Files</span>
+                                <span class="mrc-collapsible-value" id="mrc-vdr-import-file-value"></span>
+                                <span class="material-icons-outlined mrc-collapsible-arrow">expand_less</span>
+                            </div>
+                            <div class="mrc-collapsible-body open" id="mrc-vdr-import-file-body">
+                                <div id="mrc-vdr-import-file-list" class="mrc-cc-list" style="max-height:260px;overflow-y:auto">
+                                    <div class="muted text-center" style="padding:16px">Select a folder first</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Specific items (hidden by default) -->
+                    <div id="mrc-vdr-specific-panel" style="display:none">
+                        <!-- Content Classes -->
+                        <div class="mrc-collapsible-section">
+                            <div class="mrc-collapsible-header" id="mrc-vdr-cc-header">
+                                <span class="material-icons-outlined" style="font-size:18px">class</span>
+                                <span class="mrc-collapsible-title">Content Classes</span>
+                                <span class="mrc-collapsible-value" id="mrc-vdr-cc-count">0</span>
+                                <span class="material-icons-outlined mrc-collapsible-arrow">expand_more</span>
+                            </div>
+                            <div class="mrc-collapsible-body" id="mrc-vdr-cc-body">
+                                <div id="mrc-vdr-cc-list" class="mrc-cc-list" style="max-height:200px;overflow-y:auto">
+                                    <div class="muted text-center" style="padding:16px">Select a repository first</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Indexes -->
+                        <div class="mrc-collapsible-section">
+                            <div class="mrc-collapsible-header" id="mrc-vdr-idx-header">
+                                <span class="material-icons-outlined" style="font-size:18px">list</span>
+                                <span class="mrc-collapsible-title">Indexes</span>
+                                <span class="mrc-collapsible-value" id="mrc-vdr-idx-count">0</span>
+                                <span class="material-icons-outlined mrc-collapsible-arrow">expand_more</span>
+                            </div>
+                            <div class="mrc-collapsible-body" id="mrc-vdr-idx-body">
+                                <div id="mrc-vdr-idx-list" class="mrc-cc-list" style="max-height:200px;overflow-y:auto">
+                                    <div class="muted text-center" style="padding:16px">Loading…</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Index Groups -->
+                        <div class="mrc-collapsible-section">
+                            <div class="mrc-collapsible-header" id="mrc-vdr-ig-header">
+                                <span class="material-icons-outlined" style="font-size:18px">folder_copy</span>
+                                <span class="mrc-collapsible-title">Index Groups</span>
+                                <span class="mrc-collapsible-value" id="mrc-vdr-ig-count">0</span>
+                                <span class="material-icons-outlined mrc-collapsible-arrow">expand_more</span>
+                            </div>
+                            <div class="mrc-collapsible-body" id="mrc-vdr-ig-body">
+                                <div id="mrc-vdr-ig-list" class="mrc-cc-list" style="max-height:200px;overflow-y:auto">
+                                    <div class="muted text-center" style="padding:16px">Loading…</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Archiving Policies -->
+                        <div class="mrc-collapsible-section">
+                            <div class="mrc-collapsible-header" id="mrc-vdr-pol-header">
+                                <span class="material-icons-outlined" style="font-size:18px">policy</span>
+                                <span class="mrc-collapsible-title">Archiving Policies</span>
+                                <span class="mrc-collapsible-value" id="mrc-vdr-pol-count">0</span>
+                                <span class="material-icons-outlined mrc-collapsible-arrow">expand_more</span>
+                            </div>
+                            <div class="mrc-collapsible-body" id="mrc-vdr-pol-body">
+                                <div id="mrc-vdr-pol-list" class="mrc-cc-list" style="max-height:200px;overflow-y:auto">
+                                    <div class="muted text-center" style="padding:16px">Loading…</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Template + Plan preview -->
+                <div class="card" style="flex:2;display:flex;flex-direction:column">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">list_alt</span>
+                        Plan — vdrdbxml
+                    </h3>
+
+                    <!-- Command template -->
+                    <div class="form-group" style="margin-bottom:var(--space-md)">
+                        <label class="form-label">Command Template <span class="muted" style="font-weight:normal">({REPO_NAME}, {SERVER_USER}, {SERVER_PASS}, {XML_INPUT_FILE_PATH}, {XML_OUTPUT_FILE_PATH})</span></label>
+                        <textarea id="mrc-vdr-cmd-template" class="form-input" rows="2"
+                            style="font-family:var(--font-mono);font-size:13px;resize:vertical"
+                            spellcheck="false"></textarea>
+                    </div>
+
+                    <!-- Plan table -->
+                    <div class="table-container" style="flex:1;max-height:calc(100vh - 480px);overflow-y:auto">
+                        <table class="data-table compact" id="mrc-vdr-plan-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px">#</th>
+                                    <th>Repo</th>
+                                    <th>Command</th>
+                                    <th style="width:50px"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="4" class="muted">Click "Generate Plan" to preview the vdrdbxml steps</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- XML Preview -->
+                    <div id="mrc-vdr-xml-preview" style="display:none;margin-top:var(--space-md)">
+                        <details>
+                            <summary style="cursor:pointer;font-weight:600;font-size:0.85rem">
+                                <span class="material-icons-outlined" style="font-size:16px;vertical-align:middle">code</span>
+                                XML Input Preview
+                            </summary>
+                            <pre id="mrc-vdr-xml-content" style="background:var(--bg-surface);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:12px;font-size:12px;max-height:200px;overflow:auto;margin-top:8px"></pre>
+                        </details>
+                    </div>
+
+                    <div class="step-actions" style="margin-top:var(--space-md)">
+                        <button class="btn btn-secondary" id="btn-mrc-vdr-generate">
+                            <span class="material-icons-outlined">preview</span> Generate Plan
+                        </button>
+                        <button class="btn btn-primary" id="btn-mrc-vdr-submit" disabled>
+                            <span class="material-icons-outlined">send</span> Submit Plan
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="result-banner" id="mrc-vdr-result-banner" style="display:none">
+                <div class="result-content">
+                    <span class="material-icons-outlined result-icon" id="mrc-vdr-result-icon">check_circle</span>
+                    <div>
+                        <strong id="mrc-vdr-result-title"></strong>
+                        <p id="mrc-vdr-result-message"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- ╔═══════════════════════════════════════════════════════════════════════╗
+     ║  TOOL 3: MIGRATE                                                   ║
+     ╚═══════════════════════════════════════════════════════════════════════╝ -->
+<div class="tool-container" id="tool-migrate">
+
+    <!-- Stepper -->
+    <div class="stepper-bar">
+        <div class="stepper-inner">
+            <div class="step active" data-step="1">
+                <div class="step-circle">1</div>
+                <span class="step-label">Mode & Worker</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="2">
+                <div class="step-circle">2</div>
+                <span class="step-label">Select Items</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="3">
+                <div class="step-circle">3</div>
+                <span class="step-label">Review & Submit</span>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <!-- ── MIG STEP 1: Mode + Worker ── -->
+        <section class="step-panel active" id="mig-step-1">
+            <div class="card" style="max-width:640px;margin:0 auto">
+                <h3 class="card-title">
+                    <span class="material-icons-outlined">swap_horiz</span>
+                    Migration Mode
+                </h3>
+                <p class="card-desc">Migrate definitions from <strong>Source</strong> to <strong>Target</strong> repository using vdrdbxml.</p>
+
+                <div class="object-type-grid" style="margin-bottom:24px">
+                    <div class="object-type-card mig-mode-card selected" data-mode="all">
+                        <span class="material-icons-outlined">select_all</span>
+                        <span class="object-type-label">All</span>
+                        <small style="color:var(--muted)">Export &amp; import all definitions</small>
+                    </div>
+                    <div class="object-type-card mig-mode-card" data-mode="specific">
+                        <span class="material-icons-outlined">checklist</span>
+                        <span class="object-type-label">Specific</span>
+                        <small style="color:var(--muted)">Select specific items to migrate</small>
+                    </div>
+                </div>
+
+                <h3 class="card-title" style="margin-top:16px">
+                    <span class="material-icons-outlined">memory</span>
+                    Worker
+                </h3>
+                <select id="mig-worker-select" class="select-input" style="width:100%">
+                    <option value="">— Select worker —</option>
+                </select>
+
+                <h3 class="card-title" style="margin-top:16px">
+                    <span class="material-icons-outlined">terminal</span>
+                    Command Template
+                </h3>
+                <textarea id="mig-vdrdbxml-template" class="code-textarea" rows="2" style="width:100%;font-family:var(--font-mono);font-size:12px;resize:vertical"></textarea>
+                <p class="card-desc" style="font-size:11px;margin-top:4px">Placeholders: <code>{REPO_NAME}</code> <code>{SERVER_USER}</code> <code>{SERVER_PASS}</code> <code>{XML_INPUT_FILE_PATH}</code> <code>{XML_OUTPUT_FILE_PATH}</code></p>
+            </div>
+            <div class="step-actions">
+                <div></div>
+                <button class="btn btn-primary" id="btn-mig-step1-next">
+                    Next <span class="material-icons-outlined">arrow_forward</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ── MIG STEP 2: Select specific items ── -->
+        <section class="step-panel" id="mig-step-2">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <!-- Content Classes -->
+                <div class="card">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">class</span>
+                        Content Classes
+                        <span class="migrate-count" id="mig-cc-count" style="margin-left:auto">0</span>
+                    </h3>
+                    <div class="table-container" style="max-height:calc(50vh - 120px);overflow-y:auto">
+                        <table class="data-table compact" id="mig-cc-table">
+                            <thead><tr><th style="width:32px"><input type="checkbox" class="mig-select-all" data-cat="cc"></th><th>Name</th></tr></thead>
+                            <tbody><tr><td colspan="2" class="muted">Loading…</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Indexes -->
+                <div class="card">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">list</span>
+                        Indexes
+                        <span class="migrate-count" id="mig-idx-count" style="margin-left:auto">0</span>
+                    </h3>
+                    <div class="table-container" style="max-height:calc(50vh - 120px);overflow-y:auto">
+                        <table class="data-table compact" id="mig-idx-table">
+                            <thead><tr><th style="width:32px"><input type="checkbox" class="mig-select-all" data-cat="idx"></th><th>Name</th></tr></thead>
+                            <tbody><tr><td colspan="2" class="muted">Loading…</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Index Groups -->
+                <div class="card">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">folder_copy</span>
+                        Index Groups
+                        <span class="migrate-count" id="mig-ig-count" style="margin-left:auto">0</span>
+                    </h3>
+                    <div class="table-container" style="max-height:calc(50vh - 120px);overflow-y:auto">
+                        <table class="data-table compact" id="mig-ig-table">
+                            <thead><tr><th style="width:32px"><input type="checkbox" class="mig-select-all" data-cat="ig"></th><th>Name</th></tr></thead>
+                            <tbody><tr><td colspan="2" class="muted">Loading…</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Archiving Policies -->
+                <div class="card">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">policy</span>
+                        Archiving Policies
+                        <span class="migrate-count" id="mig-pol-count" style="margin-left:auto">0</span>
+                    </h3>
+                    <div class="table-container" style="max-height:calc(50vh - 120px);overflow-y:auto">
+                        <table class="data-table compact" id="mig-pol-table">
+                            <thead><tr><th style="width:32px"><input type="checkbox" class="mig-select-all" data-cat="pol"></th><th>Name</th></tr></thead>
+                            <tbody><tr><td colspan="2" class="muted">Loading…</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="step-actions">
+                <button class="btn btn-secondary" id="btn-mig-step2-back">
+                    <span class="material-icons-outlined">arrow_back</span> Back
+                </button>
+                <button class="btn btn-primary" id="btn-mig-step2-next">
+                    Review Plan <span class="material-icons-outlined">arrow_forward</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ── MIG STEP 3: Review & Submit ── -->
+        <section class="step-panel" id="mig-step-3">
+            <div class="card" style="max-width:800px;margin:0 auto">
+                <h3 class="card-title">
+                    <span class="material-icons-outlined">preview</span>
+                    Migration Plan
+                </h3>
+                <p class="card-desc" id="mig-plan-summary"></p>
+                <div class="table-container">
+                    <table class="data-table compact" id="mig-plan-table">
+                        <thead>
+                            <tr><th>#</th><th>Repo</th><th>Operation</th><th>Command</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div id="mig-xml-preview" style="margin-top:16px;display:none">
+                    <h4 style="margin-bottom:8px">
+                        <span class="material-icons-outlined" style="font-size:18px;vertical-align:middle">code</span>
+                        Generated XML
+                    </h4>
+                    <pre id="mig-xml-content" style="background:var(--surface-2);padding:12px;border-radius:8px;font-size:12px;max-height:200px;overflow:auto;white-space:pre-wrap"></pre>
+                </div>
+            </div>
+            <div class="step-actions">
+                <button class="btn btn-secondary" id="btn-mig-step3-back">
+                    <span class="material-icons-outlined">arrow_back</span> Back
+                </button>
+                <button class="btn btn-primary" id="btn-mig-submit">
+                    <span class="material-icons-outlined">rocket_launch</span> Submit Plan
+                </button>
+            </div>
+            <div class="result-banner" id="mig-result-banner" style="display:none">
+                <div class="result-content">
+                    <span class="material-icons-outlined result-icon" id="mig-result-icon">check_circle</span>
+                    <div>
+                        <strong id="mig-result-title"></strong>
+                        <p id="mig-result-message"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- ╔═══════════════════════════════════════════════════════════════════════╗
+     ║  TOOL 3b: REMOVE DEFINITIONS                                       ║
+     ╚═══════════════════════════════════════════════════════════════════════╝ -->
+<div class="tool-container" id="tool-remove-defs">
+
+    <!-- Stepper -->
+    <div class="stepper-bar">
+        <div class="stepper-inner">
+            <div class="step active" data-step="1">
+                <div class="step-circle">1</div>
+                <span class="step-label">Select Items</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="2">
+                <div class="step-circle">2</div>
+                <span class="step-label">Review & Submit</span>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <!-- ── RD STEP 1: Select worker, repo, items ── -->
+        <section class="step-panel active" id="rd-step-1">
+            <!-- Worker + Repo row -->
+            <div style="display:flex;gap:16px;margin-bottom:16px;max-width:800px;margin-left:auto;margin-right:auto">
+                <div class="card" style="flex:1">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">memory</span> Worker
+                    </h3>
+                    <select id="rd-worker-select" class="select-input" style="width:100%">
+                        <option value="">— Select worker —</option>
+                    </select>
+                </div>
+                <div class="card" style="flex:1">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">dns</span> Repository
+                    </h3>
+                    <div style="display:flex;gap:8px">
+                        <button class="btn btn-outline rd-repo-btn" data-repo="source" id="rd-btn-source">Source</button>
+                        <button class="btn btn-outline rd-repo-btn active" data-repo="target" id="rd-btn-target">Target</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 category panels -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div class="card">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">class</span>
+                        Content Classes
+                        <span class="migrate-count" id="rd-cc-count" style="margin-left:auto">0</span>
+                    </h3>
+                    <div class="table-container" style="max-height:220px;overflow-y:auto">
+                        <table class="data-table compact" id="rd-cc-table">
+                            <thead><tr><th style="width:32px"><input type="checkbox" class="rd-select-all" data-cat="cc"></th><th>Name</th></tr></thead>
+                            <tbody><tr><td colspan="2" class="muted">Select a repository</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">list</span>
+                        Indexes
+                        <span class="migrate-count" id="rd-idx-count" style="margin-left:auto">0</span>
+                    </h3>
+                    <div class="table-container" style="max-height:220px;overflow-y:auto">
+                        <table class="data-table compact" id="rd-idx-table">
+                            <thead><tr><th style="width:32px"><input type="checkbox" class="rd-select-all" data-cat="idx"></th><th>Name</th></tr></thead>
+                            <tbody><tr><td colspan="2" class="muted">Select a repository</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">folder_copy</span>
+                        Index Groups
+                        <span class="migrate-count" id="rd-ig-count" style="margin-left:auto">0</span>
+                    </h3>
+                    <div class="table-container" style="max-height:220px;overflow-y:auto">
+                        <table class="data-table compact" id="rd-ig-table">
+                            <thead><tr><th style="width:32px"><input type="checkbox" class="rd-select-all" data-cat="ig"></th><th>Name</th></tr></thead>
+                            <tbody><tr><td colspan="2" class="muted">Select a repository</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">policy</span>
+                        Archiving Policies
+                        <span class="migrate-count" id="rd-pol-count" style="margin-left:auto">0</span>
+                    </h3>
+                    <div class="table-container" style="max-height:220px;overflow-y:auto">
+                        <table class="data-table compact" id="rd-pol-table">
+                            <thead><tr><th style="width:32px"><input type="checkbox" class="rd-select-all" data-cat="pol"></th><th>Name</th></tr></thead>
+                            <tbody><tr><td colspan="2" class="muted">Select a repository</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="step-actions">
+                <div></div>
+                <button class="btn btn-primary" id="btn-rd-step1-next">
+                    Review Plan <span class="material-icons-outlined">arrow_forward</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ── RD STEP 2: Review & Submit ── -->
+        <section class="step-panel" id="rd-step-2">
+            <div class="card" style="max-width:800px;margin:0 auto">
+                <h3 class="card-title">
+                    <span class="material-icons-outlined">delete_sweep</span>
+                    Remove Definitions Plan
+                </h3>
+                <p class="card-desc" id="rd-plan-summary"></p>
+                <div class="table-container">
+                    <table class="data-table compact" id="rd-plan-table">
+                        <thead>
+                            <tr><th>#</th><th>Repo</th><th>Operation</th><th>Command</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div id="rd-items-preview" style="margin-top:16px">
+                    <h4 style="margin-bottom:8px">
+                        <span class="material-icons-outlined" style="font-size:18px;vertical-align:middle">list</span>
+                        Items to Remove
+                    </h4>
+                    <pre id="rd-items-content" style="background:var(--surface-2);padding:12px;border-radius:8px;font-size:12px;max-height:200px;overflow:auto;white-space:pre-wrap"></pre>
+                </div>
+            </div>
+            <div class="step-actions">
+                <button class="btn btn-secondary" id="btn-rd-step2-back">
+                    <span class="material-icons-outlined">arrow_back</span> Back
+                </button>
+                <button class="btn btn-primary" style="background:var(--rocket-red)" id="btn-rd-submit">
+                    <span class="material-icons-outlined">delete_sweep</span> Submit Removal Plan
+                </button>
+            </div>
+            <div class="result-banner" id="rd-result-banner" style="display:none">
+                <div class="result-content">
+                    <span class="material-icons-outlined result-icon" id="rd-result-icon">check_circle</span>
+                    <div>
+                        <strong id="rd-result-title"></strong>
+                        <p id="rd-result-message"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- ╔═══════════════════════════════════════════════════════════════════════╗
+     ║  TOOL 4: WORKERS                                                   ║
+     ╚═══════════════════════════════════════════════════════════════════════╝ -->
+<div class="tool-container" id="tool-workers">
+
+    <main class="main-content">
+
+        <!-- ── WK STEP 1: Workers status ── -->
+        <section class="step-panel active" id="wk-step-1">
+            <div class="card" style="max-width:900px;margin:0 auto">
+                <h3 class="card-title">
+                    <span class="material-icons-outlined">dns</span>
+                    Active Workers
+                </h3>
+                <p class="card-desc">Workers discovered via heartbeat. Select a worker to assign work.</p>
+                <div class="migrate-toolbar">
+                    <span class="migrate-count" id="wk-worker-count">0 workers</span>
+                    <button class="btn btn-outline btn-sm" id="btn-wk-refresh">
+                        <span class="material-icons-outlined">refresh</span>
+                    </button>
+                </div>
+                <div class="table-container" style="max-height:calc(100vh - 380px);overflow-y:auto">
+                    <table class="data-table compact" id="wk-workers-table">
+                        <thead>
+                            <tr>
+                                <th style="width:32px"></th>
+                                <th>Worker</th>
+                                <th>Status</th>
+                                <th>Mode</th>
+                                <th>Plans</th>
+                                <th>Tasks</th>
+                                <th>Done</th>
+                                <th>Errors</th>
+                                <th>Heartbeat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="9" class="muted">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Live log panel (shown when a worker is selected) -->
+            <div class="card" id="wk-live-log-panel" style="max-width:90vw;margin:16px auto 0;display:none">
+                <h3 class="card-title">
+                    <span class="material-icons-outlined">terminal</span>
+                    Live Log — <span id="wk-live-log-worker" style="color:var(--rocket-blue)"></span>
+                    <span style="margin-left:auto;display:flex;align-items:center;gap:8px">
+                        <span id="wk-live-log-status" style="font-size:12px;color:var(--muted)"></span>
+                        <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;font-weight:400">
+                            <input type="checkbox" id="wk-live-log-auto" checked> Auto-refresh
+                        </label>
+                        <button class="btn btn-outline btn-sm" id="btn-wk-live-log-refresh" title="Refresh now">
+                            <span class="material-icons-outlined" style="font-size:16px">refresh</span>
+                        </button>
+                    </span>
+                </h3>
+                <pre id="wk-live-log-content" style="background:var(--surface-2);color:var(--text);padding:12px;border-radius:8px;font-size:12px;line-height:1.5;max-height:300px;overflow-y:auto;white-space:pre-wrap;margin:0"></pre>
+            </div>
+
+        </section>
+
+        <!-- ── WK STEP 2: Build & Submit Plan ── -->
+        <section class="step-panel" id="wk-step-2">
+            <div class="card" style="max-width:900px;margin:0 auto">
+                <h3 class="card-title">
+                    <span class="material-icons-outlined">list_alt</span>
+                    Build Plan for <span id="wk-plan-worker-name" style="color:var(--rocket-blue)"></span>
+                </h3>
+                <p class="card-desc">Add steps to the plan. Each step specifies a repository, operation, and command arguments.</p>
+
+                <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px">
+                    <div style="flex:0 0 120px">
+                        <label class="field-label">Plan Name</label>
+                        <input type="text" id="wk-plan-name" class="field-input" placeholder="my_plan">
+                    </div>
+                    <div style="flex:0 0 120px">
+                        <label class="field-label">REPO</label>
+                        <select id="wk-step-repo" class="field-input">
+                            <option value="SOURCE">SOURCE</option>
+                            <option value="TARGET">TARGET</option>
+                        </select>
+                    </div>
+                    <div style="flex:0 0 140px">
+                        <label class="field-label">OPERATION</label>
+                        <select id="wk-step-operation" class="field-input">
+                            <option value="acreate">acreate</option>
+                            <option value="vdrdbxml">vdrdbxml</option>
+                            <option value="adelete">adelete</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;min-width:200px">
+                        <label class="field-label">COMMAND (arguments)</label>
+                        <input type="text" id="wk-step-command" class="field-input" placeholder='-f "file.txt" -r "MyClass" -c "MyPolicy" -v 2'>
+                    </div>
+                    <button class="btn btn-outline btn-sm" id="btn-wk-add-step" title="Add step">
+                        <span class="material-icons-outlined">add</span> Add
+                    </button>
+                </div>
+
+                <div class="table-container" style="max-height:calc(100vh - 480px);overflow-y:auto">
+                    <table class="data-table compact" id="wk-plan-table">
+                        <thead>
+                            <tr>
+                                <th style="width:40px">#</th>
+                                <th style="width:90px">REPO</th>
+                                <th style="width:100px">OPERATION</th>
+                                <th>COMMAND</th>
+                                <th style="width:40px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="5" class="muted">No steps added yet</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="step-actions">
+                <button class="btn btn-secondary" id="btn-wk-step2-back">
+                    <span class="material-icons-outlined">arrow_back</span> Back
+                </button>
+                <button class="btn btn-primary" id="btn-wk-submit-plan" disabled>
+                    <span class="material-icons-outlined">send</span> Submit Plan
+                </button>
+            </div>
+            <div class="result-banner" id="wk-plan-result-banner" style="display:none">
+                <div class="result-content">
+                    <span class="material-icons-outlined result-icon" id="wk-plan-result-icon">check_circle</span>
+                    <div>
+                        <strong id="wk-plan-result-title"></strong>
+                        <p id="wk-plan-result-message"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── WK STEP 3: Tasks & Logs ── -->
+        <section class="step-panel" id="wk-step-3">
+            <div style="display:flex;gap:20px;flex-wrap:wrap">
+                <!-- Tasks -->
+                <div class="card" style="flex:1;min-width:380px">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">task</span>
+                        Tasks — <span id="wk-tasks-worker-name" style="color:var(--rocket-blue)"></span>
+                    </h3>
+                    <div class="migrate-toolbar">
+                        <span class="migrate-count" id="wk-tasks-count">0 tasks</span>
+                        <button class="btn btn-outline btn-sm" id="btn-wk-refresh-tasks">
+                            <span class="material-icons-outlined">refresh</span>
+                        </button>
+                    </div>
+                    <div class="table-container" style="max-height:calc(100vh - 360px);overflow-y:auto">
+                        <table class="data-table compact" id="wk-tasks-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th style="width:80px">Status</th>
+                                    <th style="width:120px">Modified</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="3" class="muted">Loading…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Logs -->
+                <div class="card" style="flex:1;min-width:380px">
+                    <h3 class="card-title">
+                        <span class="material-icons-outlined">description</span>
+                        Logs — <span id="wk-logs-worker-name" style="color:var(--rocket-blue)"></span>
+                    </h3>
+                    <div class="migrate-toolbar">
+                        <span class="migrate-count" id="wk-logs-count">0 logs</span>
+                        <button class="btn btn-outline btn-sm" id="btn-wk-refresh-logs">
+                            <span class="material-icons-outlined">refresh</span>
+                        </button>
+                    </div>
+                    <div class="table-container" style="max-height:calc(100vh - 360px);overflow-y:auto">
+                        <table class="data-table compact" id="wk-logs-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th style="width:120px">Modified</th>
+                                    <th style="width:60px"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="3" class="muted">Loading…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="step-actions">
+                <button class="btn btn-secondary" id="btn-wk-step3-back">
+                    <span class="material-icons-outlined">arrow_back</span> Back
+                </button>
+                <div></div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal-overlay" id="confirm-modal" style="display:none">
+    <div class="modal-dialog">
+        <h3 class="modal-title" id="confirm-modal-title">Confirm</h3>
+        <p class="modal-body" id="confirm-modal-body"></p>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" id="confirm-modal-cancel">Cancel</button>
+            <button class="btn btn-primary" id="confirm-modal-ok">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- Log viewer modal -->
+<div class="modal-overlay" id="log-modal" style="display:none">
+    <div class="modal-dialog" style="max-width:800px;width:90%">
+        <h3 class="modal-title" id="log-modal-title">Log</h3>
+        <pre class="modal-body" id="log-modal-body" style="max-height:60vh;overflow:auto;background:#1e1e1e;color:#d4d4d4;padding:16px;border-radius:8px;font-size:13px;white-space:pre-wrap;word-break:break-all"></pre>
+        <div class="modal-actions">
+            <div></div>
+            <button class="btn btn-secondary" id="log-modal-close">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════ TOAST ═══════════════════ -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Global Agent Shortcut -->
+<button id="global-ask-agent" data-agent-shortcut="true" class="global-agent-btn" title="Ask Agent from anywhere" aria-label="Ask Agent">
+    <span class="material-icons-outlined">smart_toy</span>
+    Ask Agent
+</button>
+
+<script src="/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+graph TD
+    START([START])
+    PLANNING["🎯 Planning Node<br/>- Parse intent & domain<br/>- Check if disabled<br/>- Validate prerequisites"]
+    
+    CONFIRMATION{"🔔 Confirmation<br/>Required?"}
+    
+    CONFIRM_NODE["✅ Confirmation Node<br/>- Wait for user response<br/>- confirm/yes/proceed"]
+    
+    USER_RESPONSE{"User<br/>Confirmation?"}
+    
+    ROUTE_DECISION{"Route to<br/>Domain Node"}
+    
+    ARCHIVING["📋 Archiving Policy Node<br/>• search_archiving_policies<br/>• get_archiving_policy<br/>• delete_archiving_policy"]
+    
+    INDEXES["📑 Indexes Node<br/>• list_indexes<br/>• export_indexes<br/>• import_indexes"]
+    
+    INDEX_GROUPS["📚 Index Groups Node<br/>• export_index_groups<br/>• import_index_groups"]
+    
+    CONTENT_CLASSES["🏷️ Content Classes Node<br/>• list_content_classes<br/>• export_content_classes<br/>• import_content_classes<br/>• list_content_class_versions"]
+    
+    DOCUMENTS["📄 Documents Node<br/>• search documents<br/>• get_document_url<br/>• get_versions<br/>• smart_chat"]
+    
+    GENERAL["🌐 General Query Node<br/>• repo_info<br/>• general knowledge queries"]
+    
+    END_SUCCESS([END])
+    END_ERROR([END - Error])
+    
+    START --> PLANNING
+    
+    PLANNING -->|"No error,<br/>valid operation"| CONFIRMATION
+    PLANNING -->|"Error or<br/>disabled operation"| END_ERROR
+    
+    CONFIRMATION -->|"Yes"| CONFIRM_NODE
+    CONFIRMATION -->|"No"| ROUTE_DECISION
+    
+    CONFIRM_NODE --> USER_RESPONSE
+    USER_RESPONSE -->|"Confirmed"| ROUTE_DECISION
+    USER_RESPONSE -->|"Cancelled"| END_ERROR
+    
+    ROUTE_DECISION -->|"Archiving Policy"| ARCHIVING
+    ROUTE_DECISION -->|"Indexes"| INDEXES
+    ROUTE_DECISION -->|"Index Groups"| INDEX_GROUPS
+    ROUTE_DECISION -->|"Content Classes"| CONTENT_CLASSES
+    ROUTE_DECISION -->|"Documents"| DOCUMENTS
+    ROUTE_DECISION -->|"General"| GENERAL
+    
+    ARCHIVING --> END_SUCCESS
+    INDEXES --> END_SUCCESS
+    INDEX_GROUPS --> END_SUCCESS
+    CONTENT_CLASSES --> END_SUCCESS
+    DOCUMENTS --> END_SUCCESS
+    GENERAL --> END_SUCCESS
+    
+    style START fill:#90EE90
+    style END_SUCCESS fill:#87CEEB
+    style END_ERROR fill:#FFB6C6
+    style PLANNING fill:#FFE4B5
+    style CONFIRMATION fill:#DDA0DD
+    style CONFIRM_NODE fill:#DDA0DD
+    style USER_RESPONSE fill:#DDA0DD
+    style ROUTE_DECISION fill:#F0E68C
+    style ARCHIVING fill:#B0E0E6
+    style INDEXES fill:#B0E0E6
+    style INDEX_GROUPS fill:#B0E0E6
+    style CONTENT_CLASSES fill:#B0E0E6
+    style DOCUMENTS fill:#B0E0E6
+    style GENERAL fill:#B0E0E6

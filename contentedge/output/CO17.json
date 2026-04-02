@@ -1,0 +1,278 @@
+{
+  "name": "CO17",
+  "version": "3.0",
+  "scope": "page",
+  "keepBlankRows": false,
+  "keepAnsiCCBlankRows": true,
+  "textOnlyMode": false,
+  "enableCalculatedFields": false,
+  "calculatedFields": null,
+  "rules": [
+    {
+      "name": "Header_1",
+      "type": "Region",
+      "ruleid": 1,
+      "mask": "",
+      "positionByMask": false,
+      "enabled": true,
+      "region": {
+        "position": {
+          "left": 0.0,
+          "right": 8.8734,
+          "top": 0.02778,
+          "bottom": 0.31556
+        },
+        "stretchHeight": false,
+        "stretchWidth": false,
+        "startAnchor": null,
+        "endAnchor": null,
+        "wordSpacingThreshold": 55.0,
+        "lineSpacingThreshold": 35.0
+      },
+      "fields": [
+        {
+          "name": "SUCURSAL",
+          "type": "number",
+          "levelType": "header1",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 9.0,
+              "right": 13.0,
+              "top": 1.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "minLength": 4,
+            "maxLength": 4,
+            "terminator": null,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 1,
+            "display_length": 15,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "B",
+            "padChar": "",
+            "minLength": 15,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        },
+        {
+          "name": "REPORTE",
+          "type": "string",
+          "levelType": "header1",
+          "allowBlank": true,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 63.0,
+              "right": 70.0,
+              "top": 0.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "terminator": null,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 5,
+            "display_length": 8,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "B",
+            "padChar": "",
+            "minLength": 8,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        },
+        {
+          "name": "FECHA",
+          "type": "date",
+          "levelType": "detail",
+          "allowBlank": false,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 105.0,
+              "right": 114.0,
+              "top": 2.0,
+              "bottom": 0.0
+            },
+            "format": "DD-MM-YYYY",
+            "minLength": 10,
+            "maxLength": 10,
+            "terminator": null,
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 6,
+            "display_length": 10,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        }
+      ]
+    }
+  ],
+  "fieldGroups": [
+    {
+      "fieldRefs": [],
+      "name": "REPORT_ID",
+      "usage": "1",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Header_1",
+          "fieldName": "FECHA",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "VERSION_ID",
+      "usage": "5",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Header_1",
+          "fieldName": "SUCURSAL",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "SECTION_ID",
+      "usage": "2",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    }
+  ],
+  "pageBindInfo": {
+    "scaleFactorX": 1.0,
+    "scaleFactorY": 1.0,
+    "offsetX": 0.0,
+    "offsetY": 0.0
+  },
+  "ruleMatchLists": [],
+  "regionBindInfoList": [],
+  "sorts": [],
+  "cutoffForTwoDigitYear": 1980,
+  "documentInfo": {
+    "parsingInfo": {
+      "dataType": "Text",
+      "charSet": "ASCII",
+      "pageBreak": {
+        "type": "FORMFEED",
+        "fixedPageLength": 0,
+        "markers": null,
+        "columns": null
+      },
+      "lineBreak": {
+        "type": "CRLF",
+        "fixedLineLength": 0
+      },
+      "jdlResource": null,
+      "jdeResource": null,
+      "useJslPageSettings": false,
+      "propagateTleRecords": false,
+      "externalResources": null,
+      "columnDelimiter": null,
+      "textEnclosure": null,
+      "alfFormat": 0,
+      "processHiddenText": false,
+      "useOCR": false,
+      "lastModified": null,
+      "filepath": "co17-2007-09-13.txt"
+    }
+  },
+  "description": "",
+  "metadataFields": {
+    "fields": [],
+    "values": []
+  },
+  "compatibility": 1,
+  "xmlParentInfoList": []
+}

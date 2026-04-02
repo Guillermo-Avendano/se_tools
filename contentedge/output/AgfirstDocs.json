@@ -1,0 +1,307 @@
+{
+  "name": "AgfirstDocs",
+  "version": "2.0",
+  "scope": "page",
+  "keepBlankRows": false,
+  "keepAnsiCCBlankRows": false,
+  "textOnlyMode": false,
+  "enableCalculatedFields": false,
+  "calculatedFields": null,
+  "rules": [],
+  "fieldGroups": [
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Metadata_fields",
+          "fieldName": "ReportID",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "REPORT_ID",
+      "usage": "1",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Metadata_fields",
+          "fieldName": "VersionID",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "VERSION_ID",
+      "usage": "5",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Metadata_fields",
+          "fieldName": "Association",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "SECTION_ID",
+      "usage": "2",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Metadata_fields",
+          "fieldName": "Association",
+          "optional": false,
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "AgfirstAsn",
+      "usage": "3",
+      "scope": "page",
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": false,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    }
+  ],
+  "ruleMatchLists": [],
+  "regionBindInfoList": [],
+  "sorts": [],
+  "defaultDateComponentOrder": "M/D/Y",
+  "cutoffForTwoDigitYear": 1950,
+  "documentInfo": {
+    "parsingInfo": {
+      "dataType": "PDF",
+      "charSet": null,
+      "pageBreak": null,
+      "lineBreak": null,
+      "jdlResource": null,
+      "jdeResource": null,
+      "useJslPageSettings": false,
+      "propagateTleRecords": false,
+      "externalResources": null,
+      "columnDelimiter": null,
+      "textEnclosure": null,
+      "alfFormat": 0,
+      "processHiddenText": false,
+      "useOCR": false,
+      "lastModified": "2026-02-15T03:48:43",
+      "filepath": "C:\\AgFirst\\AgSouth\\AgScore\\12 - GFX Contingency Audit.PDF"
+    }
+  },
+  "description": "",
+  "metadataFields": {
+    "fields": [
+      {
+        "name": "VersionID",
+        "type": "string",
+        "levelType": "header1",
+        "metadataKey": "FILE_DATE",
+        "allowBlank": true,
+        "useRetainedValue": false,
+        "isExternal": false,
+        "parsingInfo": {
+          "position": null,
+          "format": "",
+          "terminator": null,
+          "minValue": "",
+          "maxValue": "",
+          "matchValues": [],
+          "matchValuesUsage": "",
+          "useWildCard": false,
+          "discardIncompleteWords": false
+        },
+        "outputInfo": {
+          "hide": false,
+          "sequence": 0,
+          "display_length": 0,
+          "alignment": "L",
+          "date_pattern": 0,
+          "replacementValue": null,
+          "outputFormat": "",
+          "changeCaseTo": "",
+          "removeSpaces": "",
+          "padChar": "",
+          "minLength": 0,
+          "maxLength": 0,
+          "useLookupTable": false,
+          "useThousandSeparator": "O",
+          "lookupTable": null
+        },
+        "dependencies": []
+      },
+      {
+        "name": "ReportID",
+        "type": "string",
+        "levelType": "header1",
+        "metadataKey": "FILE_DIR1",
+        "allowBlank": true,
+        "useRetainedValue": false,
+        "isExternal": false,
+        "parsingInfo": {
+          "position": {
+            "left": 0.0,
+            "right": 0.0,
+            "top": 0.0,
+            "bottom": 0.0
+          },
+          "format": "",
+          "terminator": null,
+          "minValue": "",
+          "maxValue": "",
+          "matchValues": [],
+          "matchValuesUsage": "",
+          "useWildCard": false,
+          "discardIncompleteWords": false
+        },
+        "outputInfo": {
+          "hide": false,
+          "sequence": 0,
+          "display_length": 0,
+          "alignment": "L",
+          "date_pattern": 0,
+          "replacementValue": null,
+          "outputFormat": "",
+          "changeCaseTo": "",
+          "removeSpaces": "",
+          "padChar": "",
+          "minLength": 0,
+          "maxLength": 0,
+          "useLookupTable": true,
+          "useThousandSeparator": "O",
+          "lookupTable": [
+            {
+              "name": "AgScore",
+              "value": "Agsecrpt"
+            },
+            {
+              "name": "BytePro",
+              "value": "BytePro"
+            },
+            {
+              "name": "CECL",
+              "value": "CECL"
+            },
+            {
+              "name": "Credit Delivery",
+              "value": "CRDelivery"
+            },
+            {
+              "name": "DNA LSR",
+              "value": "DNALSRQtr"
+            },
+            {
+              "name": "Encompass",
+              "value": "Encompass"
+            },
+            {
+              "name": "Hyperion",
+              "value": "Hyperion"
+            },
+            {
+              "name": "LeaseQuery",
+              "value": ""
+            }
+          ]
+        },
+        "dependencies": []
+      },
+      {
+        "name": "Association",
+        "type": "string",
+        "levelType": "header1",
+        "metadataKey": "FILE_DIR2",
+        "allowBlank": true,
+        "useRetainedValue": false,
+        "isExternal": false,
+        "parsingInfo": {
+          "position": null,
+          "format": "",
+          "terminator": null,
+          "minValue": "",
+          "maxValue": "",
+          "matchValues": [],
+          "matchValuesUsage": "",
+          "useWildCard": false,
+          "discardIncompleteWords": false
+        },
+        "outputInfo": {
+          "hide": false,
+          "sequence": 0,
+          "display_length": 0,
+          "alignment": "L",
+          "date_pattern": 0,
+          "replacementValue": null,
+          "outputFormat": "",
+          "changeCaseTo": "",
+          "removeSpaces": "",
+          "padChar": "",
+          "minLength": 0,
+          "maxLength": 0,
+          "useLookupTable": false,
+          "useThousandSeparator": "O",
+          "lookupTable": null
+        },
+        "dependencies": []
+      }
+    ],
+    "values": [
+      {
+        "name": "VersionID",
+        "value": "20260215"
+      },
+      {
+        "name": "ReportID",
+        "value": "Agsecrpt"
+      },
+      {
+        "name": "Association",
+        "value": "AgSouth"
+      }
+    ]
+  },
+  "compatibility": 0,
+  "xmlParentInfoList": []
+}

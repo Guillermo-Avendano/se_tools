@@ -1,0 +1,16 @@
+.env
+__pycache__
+*.pyc
+.pytest_cache
+.mypy_cache
+.git
+.venv
+venv
+*.log
+workspace/charts_output
+workspace/knowledge/.doc_fingerprints.json
+workspace/knowledge/.fingerprints.json
+.coverage
+htmlcov
+README.md
+chat.txt

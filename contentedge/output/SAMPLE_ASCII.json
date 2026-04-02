@@ -1,0 +1,303 @@
+{
+  "name": "SAMPLE_ASCII",
+  "version": "3.0",
+  "scope": "page",
+  "keepBlankRows": true,
+  "keepAnsiCCBlankRows": true,
+  "textOnlyMode": false,
+  "enableCalculatedFields": false,
+  "calculatedFields": null,
+  "rules": [
+    {
+      "name": "Header1",
+      "type": "Region",
+      "ruleid": 1,
+      "mask": null,
+      "positionByMask": false,
+      "enabled": true,
+      "region": {
+        "position": null,
+        "stretchHeight": false,
+        "stretchWidth": false,
+        "startAnchor": null,
+        "endAnchor": null,
+        "wordSpacingThreshold": 0.0,
+        "lineSpacingThreshold": 35.0
+      },
+      "fields": [
+        {
+          "name": "Report_ID",
+          "type": "string",
+          "levelType": "header1",
+          "allowBlank": false,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 17.0,
+              "right": 0.0,
+              "top": 2.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "terminator": " ",
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 0,
+            "display_length": 0,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        },
+        {
+          "name": "Dept",
+          "type": "string",
+          "levelType": "header1",
+          "allowBlank": false,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 17.0,
+              "right": 0.0,
+              "top": 3.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "terminator": " ",
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 0,
+            "display_length": 0,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        },
+        {
+          "name": "Region",
+          "type": "string",
+          "levelType": "header1",
+          "allowBlank": false,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 17.0,
+              "right": 0.0,
+              "top": 4.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "terminator": " ",
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 0,
+            "display_length": 0,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        },
+        {
+          "name": "Office",
+          "type": "string",
+          "levelType": "header1",
+          "allowBlank": false,
+          "useRetainedValue": false,
+          "isExternal": false,
+          "parsingInfo": {
+            "position": {
+              "left": 17.0,
+              "right": 0.0,
+              "top": 5.0,
+              "bottom": 0.0
+            },
+            "format": "",
+            "terminator": " ",
+            "minValue": "",
+            "maxValue": "",
+            "matchValues": [],
+            "matchValuesUsage": "",
+            "useWildCard": false,
+            "discardIncompleteWords": true
+          },
+          "outputInfo": {
+            "hide": false,
+            "sequence": 0,
+            "display_length": 0,
+            "alignment": "L",
+            "date_pattern": 0,
+            "replacementValue": null,
+            "outputFormat": "",
+            "changeCaseTo": "",
+            "removeSpaces": "",
+            "padChar": "",
+            "minLength": 0,
+            "maxLength": 0,
+            "useLookupTable": false,
+            "useThousandSeparator": "O",
+            "lookupTable": null
+          },
+          "dependencies": []
+        }
+      ]
+    }
+  ],
+  "fieldGroups": [
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Header1",
+          "fieldName": "Report_ID",
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "REPORT_ID",
+      "usage": "1",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    },
+    {
+      "fieldRefs": [
+        {
+          "ruleName": "Header1",
+          "fieldName": "Dept",
+          "hideDuplicateValues": false
+        },
+        {
+          "ruleName": "Header1",
+          "fieldName": "Region",
+          "hideDuplicateValues": false
+        },
+        {
+          "ruleName": "Header1",
+          "fieldName": "Office",
+          "hideDuplicateValues": false
+        }
+      ],
+      "name": "SECTION_ID",
+      "usage": "2",
+      "scope": null,
+      "requiredOccurrence": null,
+      "useLocationIndex": false,
+      "stopIfMissing": false,
+      "retainFieldValues": true,
+      "filter": null,
+      "isDefault": false,
+      "sort": null,
+      "hide": false,
+      "consolidateMatchingRows": false,
+      "aggregationTotalTag": "Total",
+      "includeHiddenFields": false
+    }
+  ],
+  "pageBindInfo": {
+    "scaleFactorX": 1.0,
+    "scaleFactorY": 1.0,
+    "offsetX": 0.0,
+    "offsetY": 0.0
+  },
+  "ruleMatchLists": [],
+  "regionBindInfoList": [],
+  "sorts": [],
+  "defaultDateComponentOrder": "M/D/Y",
+  "cutoffForTwoDigitYear": 1980,
+  "documentInfo": {
+    "parsingInfo": {
+      "dataType": "Text",
+      "charSet": "ASCII",
+      "pageBreak": {
+        "type": "FORMFEED",
+        "fixedPageLength": 0,
+        "markers": null,
+        "columns": null
+      },
+      "lineBreak": {
+        "type": "CRLF",
+        "fixedLineLength": 0
+      },
+      "jdlResource": null,
+      "jdeResource": null,
+      "useJslPageSettings": true,
+      "propagateTleRecords": true,
+      "externalResources": null,
+      "columnDelimiter": null,
+      "textEnclosure": null,
+      "alfFormat": 0,
+      "processHiddenText": false,
+      "useOCR": false,
+      "lastModified": null,
+      "filepath": "AC001.rpt"
+    }
+  },
+  "description": "",
+  "metadataFields": {
+    "fields": [],
+    "values": []
+  },
+  "compatibility": 0,
+  "xmlParentInfoList": []
+}

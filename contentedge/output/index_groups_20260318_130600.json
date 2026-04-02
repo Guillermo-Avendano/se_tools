@@ -1,0 +1,839 @@
+[
+  {
+    "id": "AC2020_IG01",
+    "name": "Details for AC2020 (Small Text Report)",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "ACDept",
+        "name": "GL - Department Name",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "ACRegion",
+        "name": "GL - Region Name",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "ACOffice",
+        "name": "GL - Office Name",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "Accounts_IG01",
+    "name": "Index Group for Accounts Data",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "AccHolder1",
+        "name": "Financial - First Account Holder",
+        "details": "Name of the first account holder",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "AccHolder2",
+        "name": "Financial - Second Account Holder",
+        "details": "Name of the second account holder",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "AccBank",
+        "name": "Financial - Bank name",
+        "details": "Name of the bank that has the account",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "AccNum",
+        "name": "Financial - Bank Account Number",
+        "details": "Number of the bank account",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "DoIssue",
+        "name": "Financial - Issue Date",
+        "details": "Date of issue of the document. Can be a Contract sign date, a Bank Account opening date or a Statement date of issue",
+        "topicVersionDisplay": "All",
+        "allowAccess": false,
+        "dataType": "Date",
+        "format": "MM/DD/YY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "DocType",
+        "name": "Financial - Type of Document",
+        "details": "Can be Contract, Check, Statement, Deposit, Signature Card, Home Loan Contract, Auto Loan Contract, Web Transaction, Withdrawal, Insurance or a Claim",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "Address_IG01",
+    "name": "Index Group for Address Data",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "AddrStreet",
+        "name": "Personal - Address Street",
+        "details": "Personal - Address Street",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "AddrCity",
+        "name": "Personal - Address City",
+        "details": "Personal - Address City",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "AddrState",
+        "name": "Personal - Address State",
+        "details": "Personal - Address State",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "AddrZIP",
+        "name": "Personal - Address ZIP Code",
+        "details": "Personal - Address ZIP Code",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "AddrPhone",
+        "name": "Peronal - Phone Number",
+        "details": "Address Phone number",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "Financ_IG01",
+    "name": "Financial - Check details",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "ChPayee",
+        "name": "Financial - Check Payee",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "ChAmnt",
+        "name": "Financial - Check Amount",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Number",
+        "format": "-#,###.##",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "Financ_IG02",
+    "name": "Financial - Contract details",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "ContNum",
+        "name": "Financial - Contract Number",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "ContType",
+        "name": "Financial - Contract Type",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "Financ_IG03",
+    "name": "Financial - Statements details",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "StDoBegin",
+        "name": "Financial - Statement Start Date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Date",
+        "format": "MM/DD/YYYY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "StDoEnd",
+        "name": "Financial - Statement End Date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Date",
+        "format": "MM/DD/YYYY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "Financ_IG04",
+    "name": "Financial - Invoice details",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "InvNum",
+        "name": "Invoice - Invoice Number",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "DoInvPay",
+        "name": "Invoice - Payment Date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Date",
+        "format": "MM/DD/YYYY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "PONum",
+        "name": "Invoice - PO Number",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "InvReq",
+        "name": "Invoice - Invoice Requisitioner",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "HealthCare_IG01",
+    "name": "Doctor Details",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "DocName",
+        "name": "HealthCare - Doctor Name",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "DocLicNum",
+        "name": "HealthCare - Doctor License Number",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "DoAppoint",
+        "name": "HealthCare - Appointment Date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Date",
+        "format": "MM/DD/YYYY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "HealthCare_IG02",
+    "name": "Exams Details",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "ExamType",
+        "name": "HealthCare - Exam Type",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "ExamPart",
+        "name": "HealthCare - Exam Body Part",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "DoExam",
+        "name": "HealthCare - Exam Date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Date",
+        "format": "MM/DD/YYYY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "Insurance_IG01",
+    "name": "General Insurance Data",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "InsType",
+        "name": "Insurance - Type of Insurance",
+        "details": "Type of Insurance. Can be Auto, Health, Life, Travel, Dental, etc.",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "PolNumber",
+        "name": "Insurance - Policy Number",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "DoInStart",
+        "name": "Insurance - Coverage Start Date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": false,
+        "dataType": "Date",
+        "format": "MM/DD/YY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "DoInEnd",
+        "name": "Insurance - Coverage End Date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": false,
+        "dataType": "Date",
+        "format": "MM/DD/YY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "Insurance_IG02",
+    "name": "Auto details",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "CarModel",
+        "name": "Insurance - Car Model",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "CarYear",
+        "name": "Insurance - Car Year",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "VINNum",
+        "name": "Insurance - Vehicle Identification Number",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "Insurance_IG03",
+    "name": "Claim Details",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "ClaimID",
+        "name": "Insurance - Claim ID",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "DoInClaim",
+        "name": "Insurance - Claim Date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": false,
+        "dataType": "Date",
+        "format": "MM/DD/YY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "LPLGrpActivity",
+    "name": "LPL  - Order  and Account Numbers Grouped",
+    "scope": "Line",
+    "topics": [
+      {
+        "id": "LPLGrpAcct",
+        "name": "LPL  - Account Numbers Grouped",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "LPLGrpOrdr",
+        "name": "LPL  - Order Numbers Grouped",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "Payroll_IG01",
+    "name": "Payroll Details",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "DoPayBegin",
+        "name": "HR - Payslip period start date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Date",
+        "format": "MM/DD/YYYY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "DoPayEnd",
+        "name": "HR - Payslip period end date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Date",
+        "format": "MM/DD/YYYY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "DoPay",
+        "name": "Financial - Payment Date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Date",
+        "format": "MM/DD/YYYY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "PayCheck",
+        "name": "HR - Pay Check Number",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "PersonDoc_IG01",
+    "name": "Personal Documentation Details - Certificates",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "CertType",
+        "name": "Personal - Certificate Type",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "CertPlace",
+        "name": "Personal - Certificate Place",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "PersonDoc_IG02",
+    "name": "Personal Documentation Details - Passports",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "PptNum",
+        "name": "Personal - Passport Number",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "PptDoIssue",
+        "name": "Personal - Passport Issue Date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Date",
+        "format": "MM/DD/YYYY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "PptDoExp",
+        "name": "Personal - Passport Expiration Date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Date",
+        "format": "MM/DD/YYYY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "PersonDoc_IG03",
+    "name": "Personal Documentation Details - Driver License",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "DrLicNum",
+        "name": "Personal - Driver License Number",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "DrLicDoIss",
+        "name": "Personal - Driver License Issue Date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Date",
+        "format": "MM/DD/YYYY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "DrLicDoExp",
+        "name": "Personal - Driver License Expiration Date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Date",
+        "format": "MM/DD/YYYY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "Person_IG01",
+    "name": "Personal Data",
+    "scope": "Page",
+    "topics": [
+      {
+        "id": "FName",
+        "name": "Personal - First Name",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "MName",
+        "name": "Personal - Middle Name",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "LName",
+        "name": "Personal - Last Name",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "DoBirth",
+        "name": "Personal - Birth Date",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Date",
+        "format": "MM/DD/YYYY",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "PoBirth",
+        "name": "Personal - Place of Birth",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "CoBirth",
+        "name": "Personal - Country of Birth",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "Gender",
+        "name": "Personal - Gender",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  },
+  {
+    "id": "PrivacyDocs",
+    "name": "PrivacyScannedDocuments",
+    "scope": "Any",
+    "topics": [
+      {
+        "id": "Department",
+        "name": "Privacy - Department Docs",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "BFileNames",
+        "name": "Privacy - Scanned File Names",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "255",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "PSensitive",
+        "name": "Privacy - PII and Sensitive Document Categories",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Character",
+        "maxLength": "30",
+        "enableIndex": false,
+        "category": "Document metadata"
+      },
+      {
+        "id": "PIICount",
+        "name": "Privacy - PII and Sensitive Counts Per document",
+        "details": "",
+        "topicVersionDisplay": "All",
+        "allowAccess": true,
+        "dataType": "Number",
+        "format": "-####",
+        "enableIndex": false,
+        "category": "Document metadata"
+      }
+    ]
+  }
+]

@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<VDRNET_DB_MASS_UPDATE VDRNET_VERSION="12.5.2">
+
+<REPORT action="get" outAction="add/modify">
+<REPORT_ID>AC001</REPORT_ID>
+<REPORT>
+
+<TOPIC action="get" outAction="add/modify">
+ <TOPIC_ID>AC001</TOPIC_ID>
+</TOPIC>
+
+<TOPIC_GROUP action="get" outAction="add/modify">
+ <TOPIC_GROUP_ID>AC001</TOPIC_GROUP_ID>
+</TOPIC_GROUP>
+
+<POLICY action="get" outAction="add/modify">
+ <POLICY_ID>AC001</POLICY_ID>
+</POLICY>
+
+</VDRNET_DB_MASS_UPDATE>

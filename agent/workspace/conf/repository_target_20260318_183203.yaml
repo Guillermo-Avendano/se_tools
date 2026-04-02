@@ -1,0 +1,15 @@
+repository:
+  log_level: DEBUG
+  repo_url: https://services-us-virginia-m-1.skytap.com:10123
+  repo_name: Mobius
+  repo_user: admin
+  repo_pass: admin
+  repo_server_user: ADMIN
+  repo_server_pass: ''
+  repo_id: 1CD53740-16C0-410F-99C2-23FDF6FB8934
+  repo_id_enc: /mobius/adminrest/vdrrepositories/ENC(M2FmOWIzM2QtOTc1ZC00MWE2LTg1MWUtNTAxNmVlYTFiNWFjL3Zkcm5ldGRz)
+  content_source_id: 3af9b33d-975d-41a6-851e-5016eea1b5ac
+  class_navigator_cache_days_cc: 365
+  class_navigator_cache_days_reports: 30
+  class_navigator_cache_days_versions: 30
+  class_navigator_page_limit: 200

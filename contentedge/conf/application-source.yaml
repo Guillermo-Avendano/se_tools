@@ -1,0 +1,11 @@
+asg:
+  mobius:
+    cli:
+      repos:
+      - repositoryName: "Mobius"
+        repositoryUrl: "https://services-us-virginia-m-1.skytap.com:10123/mobius"
+        userName: "ADMIN"
+      user:
+        basicauth:
+          userName: "admin"
+          password: "ASG_ENC(i9motYxCmo6RLqOiHifcDw==)"

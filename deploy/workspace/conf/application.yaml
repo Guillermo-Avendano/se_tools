@@ -1,0 +1,11 @@
+asg:
+  mobius:
+    cli:
+      repos:
+      - repositoryName: "Mobius"
+        repositoryUrl: "https://mobius12.local.net:443/mobius"
+        userName: "ADMIN"
+      user:
+        basicauth:
+          userName: "admin"
+          password: "ASG_ENC(i9motYxCmo6RLqOiHifcDw==)"

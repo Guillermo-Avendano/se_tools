@@ -1,0 +1,14 @@
+{
+  "name": "se-ce-tools-ui",
+  "version": "1.0.0",
+  "description": "SE ContentEdge Tools Web UI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "http-proxy-middleware": "^3.0.0"
+  }
+}
