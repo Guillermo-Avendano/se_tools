@@ -1,9 +1,12 @@
 """API routes for the SE-Content-Agent."""
 
+import json
+import asyncio
 import re
 import httpx
 import structlog
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
 
 from app.config import settings
 from app.models.schemas import (
@@ -165,6 +168,107 @@ async def ask(request: AskRequest):
     except Exception as e:
         logger.error("api.ask.error", error=str(e))
         raise HTTPException(status_code=500, detail=f"Agent error: {e}")
+
+
+@router.post("/ask/stream", tags=["agent"])
+async def ask_stream(request: AskRequest):
+    """Stream progress events and final answer for an ask request (SSE)."""
+
+    def _sse(event: str, payload: dict) -> str:
+        return f"event: {event}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n"
+
+    async def _event_generator():
+        logger.info("api.ask.stream", question=request.question[:100], session_id=request.session_id)
+        yield _sse("status", {"stage": "received", "message": "Request received"})
+
+        try:
+            # Detect reset phrases at the start of the message
+            question = request.question
+            history_reset = False
+            reset_match = _RESET_PATTERN.match(question)
+            if reset_match:
+                history_reset = True
+                question = question[reset_match.end():].strip()
+
+            if history_reset and request.session_id:
+                yield _sse("status", {"stage": "reset_history", "message": "Resetting chat history"})
+                logger.info("api.ask.reset_history", session_id=request.session_id)
+                await clear_history(request.session_id)
+
+            yield _sse("status", {"stage": "loading_history", "message": "Loading conversation context"})
+            if request.session_id:
+                chat_history = await get_history(
+                    request.session_id, max_turns=settings.redis_max_turns
+                ) if not history_reset else []
+            else:
+                chat_history = [] if history_reset else [msg.model_dump() for msg in request.chat_history]
+
+            if not question:
+                question = request.question
+
+            effective_question = _merge_context_hint(question, request.context_hint)
+            effective_context = _parse_context_hint(request.context_hint)
+            if effective_context:
+                logger.info(
+                    "api.ask.context_effective",
+                    session_id=request.session_id,
+                    history_reset=history_reset,
+                    context=effective_context,
+                    original_question=question[:200],
+                    effective_question=effective_question[:500],
+                )
+
+            yield _sse("status", {"stage": "agent_processing", "message": "Analyzing context and running tools"})
+            progress_queue: asyncio.Queue[dict] = asyncio.Queue()
+
+            async def _progress_cb(stage: str, message: str, meta: dict | None = None):
+                await progress_queue.put({"stage": stage, "message": message, "meta": meta or {}})
+
+            task = asyncio.create_task(
+                ask_agent(
+                    question=effective_question,
+                    chat_history=chat_history if chat_history else None,
+                    progress_cb=_progress_cb,
+                )
+            )
+
+            while True:
+                if task.done() and progress_queue.empty():
+                    break
+                try:
+                    item = await asyncio.wait_for(progress_queue.get(), timeout=0.2)
+                    yield _sse("status", {
+                        "stage": item.get("stage", "agent_processing"),
+                        "message": item.get("message", "Processing"),
+                        "meta": item.get("meta", {}),
+                    })
+                except asyncio.TimeoutError:
+                    continue
+
+            result = await task
+
+            if request.session_id:
+                yield _sse("status", {"stage": "saving_history", "message": "Saving conversation history"})
+                await append_messages(
+                    request.session_id, request.question, result["answer"]
+                )
+
+            yield _sse("status", {"stage": "finalizing", "message": "Finalizing response"})
+            yield _sse("answer", {"answer": result.get("answer", "")})
+            yield _sse("done", {"ok": True})
+        except Exception as e:
+            logger.error("api.ask.stream.error", error=str(e))
+            yield _sse("error", {"detail": f"Agent error: {e}"})
+
+    return StreamingResponse(
+        _event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 # ─── Clear Conversation History ──────────────────────────────

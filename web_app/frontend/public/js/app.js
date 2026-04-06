@@ -206,25 +206,25 @@ async function initGlobalAgentShortcut() {
 
     let chatUrl = `${window.location.protocol}//${window.location.hostname}:3001`;
     let agentApiUrl = `${window.location.protocol}//${window.location.hostname}:8000`;
-    try {
-        const info = await API.get('/api/agent/info');
-        const enabled = !!info?.enabled;
-        if (!enabled) {
-            setAgentShortcutVisibility(false);
-            return;
+
+    const refreshAgentShortcutStatus = async () => {
+        try {
+            const info = await API.get('/api/agent/info');
+            const enabled = !!info?.enabled;
+            setAgentShortcutVisibility(enabled);
+            if (enabled && info?.anythingllm_port) {
+                chatUrl = `${window.location.protocol}//${window.location.hostname}:${info.anythingllm_port}`;
+            }
+            if (enabled && info?.agent_api_port) {
+                agentApiUrl = `${window.location.protocol}//${window.location.hostname}:${info.agent_api_port}`;
+            }
+        } catch (_) {
+            // Keep current visibility on transient API errors; periodic refresh retries.
         }
-        setAgentShortcutVisibility(true);
-        if (info?.enabled && info?.anythingllm_port) {
-            chatUrl = `${window.location.protocol}//${window.location.hostname}:${info.anythingllm_port}`;
-        }
-        if (info?.enabled && info?.agent_api_port) {
-            agentApiUrl = `${window.location.protocol}//${window.location.hostname}:${info.agent_api_port}`;
-        }
-    } catch (_) {
-        // If status cannot be validated, hide shortcut to avoid broken UX.
-        setAgentShortcutVisibility(false);
-        return;
-    }
+    };
+
+    await refreshAgentShortcutStatus();
+    window.setInterval(refreshAgentShortcutStatus, 15000);
 
     const openAgentChat = (ev) => {
         if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();

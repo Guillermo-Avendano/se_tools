@@ -1,0 +1,3 @@
+How to delete only content from before March 2021
+
+Can you create this Index Group if it doesn't exist in TARGET?

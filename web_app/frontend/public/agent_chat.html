@@ -555,6 +555,22 @@
                 { id: "step-4", title: "Response", progress: 100, message: "✅ Finalizando respuesta..." },
             ];
 
+            const STAGE_TO_PROGRESS = {
+                received: { step: 0, busy: "Request received by agent...", overlay: "The agent has received your request." },
+                reset_history: { step: 0, busy: "Resetting chat history...", overlay: "Resetting session history before processing." },
+                loading_history: { step: 1, busy: "Loading conversation context...", overlay: "Loading recent turns for this session." },
+                agent_processing: { step: 2, busy: "Analyzing context and running tools...", overlay: "Retrieving context and generating response." },
+                routing_contentedge_langgraph: { step: 2, busy: "Routing to ContentEdge LangGraph...", overlay: "Using domain graph for ContentEdge operation." },
+                routing_general_react: { step: 2, busy: "Routing to general ReAct agent...", overlay: "Using general tool-enabled reasoning path." },
+                harness_attempt: { step: 2, busy: "Executing harness attempt...", overlay: "Running resilient execution attempt." },
+                harness_retry: { step: 2, busy: "Transient error detected, retrying...", overlay: "Retrying with harness backoff." },
+                harness_fallback_start: { step: 2, busy: "Primary path failed, starting fallback...", overlay: "Switching to fallback route." },
+                harness_fallback_success: { step: 3, busy: "Fallback completed successfully...", overlay: "Fallback route produced a valid answer." },
+                harness_give_up: { step: 3, busy: "Unable to complete request after retries.", overlay: "All harness attempts failed." },
+                saving_history: { step: 3, busy: "Saving conversation history...", overlay: "Saving the response into chat history." },
+                finalizing: { step: 3, busy: "Finalizing response...", overlay: "Final formatting before display." },
+            };
+
             function setStatus(message, isError = false) {
                 statusEl.textContent = message || "";
                 statusEl.classList.toggle("error", !!isError);
@@ -589,11 +605,6 @@
                     const elapsed = Math.floor((Date.now() - startTime) / 1000);
                     timer.textContent = elapsed + "s";
 
-                    // Auto-advance steps based on time
-                    if (elapsed > 2 && elapsed <= 10) updateProgress(1);
-                    else if (elapsed > 10 && elapsed <= 20) updateProgress(2);
-                    else if (elapsed > 20) updateProgress(3);
-
                     // Warn if taking too long
                     if (elapsed > 90) {
                         progressTitle.textContent = "⏱️ Taking longer than expected... (90s+)";
@@ -609,6 +620,58 @@
                 }
             }
 
+            function applyStreamStatus(stage, fallbackMessage) {
+                const mapped = STAGE_TO_PROGRESS[stage] || null;
+                if (mapped) {
+                    updateProgress(mapped.step);
+                    if (busyTextEl) busyTextEl.textContent = mapped.busy;
+                    if (processingBody) processingBody.textContent = mapped.overlay;
+                    if (pendingBubble) {
+                        pendingBubble.innerHTML = `${mapped.busy}<span class="typing-dots"><span></span><span></span><span></span></span>`;
+                        messagesEl.scrollTop = messagesEl.scrollHeight;
+                    }
+                    return;
+                }
+                if (fallbackMessage) {
+                    if (busyTextEl) busyTextEl.textContent = fallbackMessage;
+                    if (processingBody) processingBody.textContent = fallbackMessage;
+                    if (pendingBubble) {
+                        pendingBubble.innerHTML = `${fallbackMessage}<span class="typing-dots"><span></span><span></span><span></span></span>`;
+                        messagesEl.scrollTop = messagesEl.scrollHeight;
+                    }
+                }
+            }
+
+            function parseSseEvents(chunkBuffer) {
+                const events = [];
+                const parts = chunkBuffer.split("\n\n");
+                const remainder = parts.pop() || "";
+
+                for (const part of parts) {
+                    const lines = part.split("\n");
+                    let event = "message";
+                    const dataLines = [];
+                    for (const line of lines) {
+                        if (line.startsWith("event:")) {
+                            event = line.slice(6).trim();
+                        } else if (line.startsWith("data:")) {
+                            dataLines.push(line.slice(5).trim());
+                        }
+                    }
+                    let payload = {};
+                    const rawData = dataLines.join("\n");
+                    if (rawData) {
+                        try {
+                            payload = JSON.parse(rawData);
+                        } catch (_) {
+                            payload = { raw: rawData };
+                        }
+                    }
+                    events.push({ event, payload });
+                }
+                return { events, remainder };
+            }
+
             function renderMessage(role, content) {
                 if (emptyStateEl) {
                     emptyStateEl.remove();
@@ -621,16 +684,23 @@
                 return bubble;
             }
 
-            function renderThinkingMessage() {
+            function renderThinkingMessage(text) {
                 if (emptyStateEl) {
                     emptyStateEl.remove();
                 }
                 const bubble = document.createElement("article");
                 bubble.className = "message assistant thinking";
-                bubble.innerHTML = "Agent is analyzing context and preparing a response<span class=\"typing-dots\"><span></span><span></span><span></span></span>";
+                const message = text || "Agent is analyzing context and preparing a response";
+                bubble.innerHTML = `${message}<span class="typing-dots"><span></span><span></span><span></span></span>`;
                 messagesEl.appendChild(bubble);
                 messagesEl.scrollTop = messagesEl.scrollHeight;
                 return bubble;
+            }
+
+            function clearThinkingMessage() {
+                if (!pendingBubble) return;
+                pendingBubble.remove();
+                pendingBubble = null;
             }
 
             function setBusy(busy) {
@@ -641,8 +711,9 @@
                 retryBtn.disabled = busy || !lastQuestion;
                 sendBtn.textContent = busy ? "Working..." : defaultSendLabel;
                 busyEl.classList.toggle("active", !!busy);
-                processingOverlay.classList.toggle("active", !!busy);
-                processingOverlay.setAttribute("aria-busy", busy ? "true" : "false");
+                // Do not block the whole screen while processing.
+                processingOverlay.classList.remove("active");
+                processingOverlay.setAttribute("aria-busy", "false");
                 if (!busy && busyTextEl) {
                     busyTextEl.textContent = "Agent is working on your request...";
                 }
@@ -660,15 +731,18 @@
                 setBusy(true);
                 startProgressAnimation();
                 setStatus("Enviando solicitud con contexto de SE Tools...");
+                pendingBubble = renderThinkingMessage("Sending request to agent API...");
 
                 try {
                     const answer = await sendQuestion(question);
                     stopProgressAnimation();
-                    
+
+                    clearThinkingMessage();
                     renderMessage("assistant", answer || "No response returned.");
                     setStatus("✅ Respuesta recibida exitosamente.");
                 } catch (error) {
                     stopProgressAnimation();
+                    clearThinkingMessage();
                     
                     const aborted = error && (error.name === "AbortError" || error.message === "timeout");
                     if (aborted) {
@@ -692,14 +766,13 @@
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort("timeout"), REQUEST_TIMEOUT_MS);
                 try {
-                    updateProgress(1);
-                    if (busyTextEl) busyTextEl.textContent = "Sending request to agent API...";
-                    if (processingBody) processingBody.textContent = "Sending your question and context to the agent.";
-                    
-                    const response = await fetch(`${apiBase}/ask`, {
+                    applyStreamStatus("received", "Sending request to agent API...");
+
+                    const response = await fetch(`${apiBase}/ask/stream`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
+                            "Accept": "text/event-stream",
                         },
                         signal: controller.signal,
                         body: JSON.stringify({
@@ -709,20 +782,41 @@
                         }),
                     });
 
-                    updateProgress(2);
-                    if (busyTextEl) busyTextEl.textContent = "Agent is retrieving context and generating response...";
-                    if (processingBody) processingBody.textContent = "The agent is retrieving knowledge chunks and generating an answer.";
-                    
-                    const data = await response.json().catch(() => ({}));
                     if (!response.ok) {
+                        const data = await response.json().catch(() => ({}));
                         const detail = data?.detail || `HTTP ${response.status}`;
                         throw new Error(detail);
                     }
 
-                    updateProgress(3);
-                    if (busyTextEl) busyTextEl.textContent = "Finalizing response...";
-                    if (processingBody) processingBody.textContent = "Finalizing response and preparing it for display.";
-                    return data.answer || "";
+                    if (!response.body) {
+                        throw new Error("Streaming response body is missing");
+                    }
+
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder("utf-8");
+                    let buffer = "";
+                    let finalAnswer = "";
+
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        if (done) break;
+                        buffer += decoder.decode(value, { stream: true });
+                        const parsed = parseSseEvents(buffer);
+                        buffer = parsed.remainder;
+
+                        for (const evt of parsed.events) {
+                            if (evt.event === "status") {
+                                applyStreamStatus(evt.payload?.stage, evt.payload?.message || "Processing...");
+                            } else if (evt.event === "answer") {
+                                finalAnswer = evt.payload?.answer || "";
+                                updateProgress(3);
+                            } else if (evt.event === "error") {
+                                throw new Error(evt.payload?.detail || "Agent stream failed");
+                            }
+                        }
+                    }
+
+                    return finalAnswer;
                 } finally {
                     clearTimeout(timeoutId);
                 }

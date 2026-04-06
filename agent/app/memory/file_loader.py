@@ -6,7 +6,7 @@ Qdrant collection used for schema descriptions so the agent can
 retrieve them as context.
 
 For PDF files, the loader first generates a Markdown mirror under
-workspace/knowledge/.generated_md/ and indexes the generated Markdown
+workspace/knowledge/generated_md/ and indexes the generated Markdown
 content so retrieval is cleaner than raw PDF extraction.
 
 Uses a fingerprint file to skip re-embedding unchanged files on restart.
@@ -39,7 +39,9 @@ CHUNK_OVERLAP = 200
 
 # Fingerprint file stores {filename: md5_hash} to detect changes
 _FINGERPRINT_PATH = FILES_DIR / ".doc_fingerprints.json"
-_GENERATED_MD_DIR = FILES_DIR / ".generated_md"
+_GENERATED_MD_DIR = FILES_DIR / "generated_md"
+_LEGACY_GENERATED_MD_DIR = FILES_DIR / ".generated_md"
+_MANUALS_DIR = FILES_DIR / "manuals"
 
 
 # ── Readers ──────────────────────────────────────────────────
@@ -163,6 +165,34 @@ def _save_fingerprints(fp: dict[str, str]) -> None:
     _FINGERPRINT_PATH.write_text(json.dumps(fp, indent=2), encoding="utf-8")
 
 
+def _collection_is_empty(client, collection: str) -> bool:
+    """Return whether the Qdrant collection has zero points."""
+    try:
+        return (client.count(collection_name=collection, exact=False).count or 0) == 0
+    except Exception as e:
+        logger.warning("file_loader.collection_count_error", error=str(e))
+        return False
+
+
+def _regenerate_pdfs_to_generated_md() -> int:
+    """Regenerate all PDF mirrors from knowledge/ into knowledge/generated_md/."""
+    if not FILES_DIR.exists():
+        return 0
+    regenerated = 0
+    for pdf_path in sorted(FILES_DIR.rglob("*.pdf")):
+        rel_parts = pdf_path.relative_to(FILES_DIR).parts
+        if rel_parts and rel_parts[0] in {"generated_md", ".generated_md"}:
+            continue
+        try:
+            _convert_pdf_to_markdown(pdf_path)
+            regenerated += 1
+        except Exception as e:
+            logger.warning("pdf_to_markdown.regenerate_error", file=str(pdf_path), error=str(e))
+    if regenerated:
+        logger.info("pdf_to_markdown.regenerated", files=regenerated)
+    return regenerated
+
+
 # ── Public API ───────────────────────────────────────────────
 
 def load_files_for_memory(force_reindex: bool = False) -> int:
@@ -178,10 +208,18 @@ def load_files_for_memory(force_reindex: bool = False) -> int:
         logger.info("file_loader.dir_missing", path=str(FILES_DIR))
         return 0
 
-    supported = [
+    # Root-level files in knowledge/
+    root_files = [
         f for f in sorted(FILES_DIR.iterdir())
         if f.suffix.lower() in _READERS and f.is_file()
     ]
+    # Pre-generated markdown files from PDF conversion (knowledge/generated_md/**)
+    # These are indexed as documents so they are available for RAG retrieval.
+    generated_md_files = sorted(_GENERATED_MD_DIR.rglob("*.md")) if _GENERATED_MD_DIR.exists() else []
+    legacy_generated_md_files = sorted(_LEGACY_GENERATED_MD_DIR.rglob("*.md")) if _LEGACY_GENERATED_MD_DIR.exists() else []
+
+    supported = root_files + [f for f in generated_md_files if f not in root_files]
+    supported.extend([f for f in legacy_generated_md_files if f not in supported])
     if not supported:
         logger.info("file_loader.no_files")
         return 0
@@ -197,9 +235,14 @@ def load_files_for_memory(force_reindex: bool = False) -> int:
     # Determine which files changed
     changed_files: list[Path] = []
     for fpath in supported:
+        # Use path relative to FILES_DIR as fingerprint key to avoid name collisions
+        try:
+            fp_key = str(fpath.relative_to(FILES_DIR))
+        except ValueError:
+            fp_key = fpath.name
         h = _compute_file_hash(fpath)
-        new_fp[fpath.name] = h
-        if force_reindex or old_fp.get(fpath.name) != h or _pdf_markdown_missing(fpath):
+        new_fp[fp_key] = h
+        if force_reindex or old_fp.get(fp_key) != h or _pdf_markdown_missing(fpath):
             changed_files.append(fpath)
 
     if not changed_files:
@@ -262,11 +305,10 @@ def load_files_for_memory(force_reindex: bool = False) -> int:
 KNOWLEDGE_DIR = WORKSPACE_ROOT / "knowledge"
 _KNOWLEDGE_FP_PATH = KNOWLEDGE_DIR / ".fingerprints.json"
 
-# Subdirectories → Qdrant category tag
-_KNOWLEDGE_CATEGORIES = {
-    "corrections": "correction",
-    "procedures": "procedure",
-    "preferences": "preference",
+# Subdirectories explicitly indexed as knowledge sources.
+_KNOWLEDGE_SOURCE_DIRS = {
+    "manuals": "manual",
+    "generated_md": "generated_md",
 }
 
 # Supported formats for categorized knowledge files.
@@ -288,10 +330,11 @@ def _save_knowledge_fingerprints(fp: dict[str, str]) -> None:
 
 
 def load_knowledge_for_memory(force_reindex: bool = False) -> int:
-    """Index agent knowledge files (corrections, procedures, preferences) into Qdrant.
+    """Index knowledge Markdown files from manuals/ and generated_md/ into Qdrant.
 
     Uses fingerprinting to skip unchanged files. If Qdrant was wiped,
-    all files will appear as "new" and get re-indexed.
+    all PDFs under knowledge/ are reprocessed into generated_md/ first,
+    then markdown files are re-indexed.
     Pass force_reindex=True to ignore fingerprints and reindex all files.
 
     Returns total number of newly indexed chunks.
@@ -300,34 +343,39 @@ def load_knowledge_for_memory(force_reindex: bool = False) -> int:
         logger.info("knowledge_loader.dir_missing", path=str(KNOWLEDGE_DIR))
         return 0
 
-    # Gather supported files from category subdirectories.
+    client = get_qdrant_client()
+    embeddings = get_embeddings()
+    collection = settings.qdrant_collection
+    ensure_collection(client, collection, embeddings)
+
+    collection_empty = _collection_is_empty(client, collection)
+    if collection_empty:
+        _GENERATED_MD_DIR.mkdir(parents=True, exist_ok=True)
+        _regenerate_pdfs_to_generated_md()
+
+    # Gather supported markdown files only from manuals/ and generated_md/.
     all_files: list[tuple[Path, str]] = []  # (path, category)
-    for subdir_name, category in _KNOWLEDGE_CATEGORIES.items():
+    for subdir_name, category in _KNOWLEDGE_SOURCE_DIRS.items():
         subdir = KNOWLEDGE_DIR / subdir_name
         if not subdir.exists():
             continue
-        for f in sorted(subdir.iterdir()):
-            if f.suffix.lower() in _KNOWLEDGE_SUFFIXES and f.is_file():
+        for f in sorted(subdir.rglob("*")):
+            if f.suffix.lower() == ".md" and f.is_file():
                 all_files.append((f, category))
 
     if not all_files:
         logger.info("knowledge_loader.no_files")
         return 0
 
-    client = get_qdrant_client()
-    embeddings = get_embeddings()
-    collection = settings.qdrant_collection
-    ensure_collection(client, collection, embeddings)
-
     old_fp = _load_knowledge_fingerprints()
     new_fp: dict[str, str] = {}
 
     changed: list[tuple[Path, str]] = []
     for fpath, category in all_files:
-        key = f"{category}/{fpath.name}"
+        key = str(fpath.relative_to(KNOWLEDGE_DIR))
         h = _compute_file_hash(fpath)
         new_fp[key] = h
-        if force_reindex or old_fp.get(key) != h or _pdf_markdown_missing(fpath):
+        if force_reindex or collection_empty or old_fp.get(key) != h:
             changed.append((fpath, category))
 
     if not changed:

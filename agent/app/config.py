@@ -52,6 +52,11 @@ class Settings(BaseSettings):
 
     # App
     agent_name: str = Field(default="SE-Content-Agent")
+    # Harness resilience controls
+    agent_harness_timeout_seconds: float = Field(default=120.0)
+    agent_harness_fallback_timeout_seconds: float = Field(default=90.0)
+    agent_harness_max_attempts: int = Field(default=2)
+    agent_harness_retry_backoff_seconds: float = Field(default=0.25)
     app_host: str = Field(default="0.0.0.0")
     app_port: int = Field(default=8000)
     app_base_url: str = Field(default="http://localhost:8000")

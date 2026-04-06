@@ -169,6 +169,41 @@ Expected columns:
 - `List content classes in target, simple`
 - `List archiving policies in source, detailed`
 
+## MobiusRemoteCLI adelete — Date filter syntax
+
+### The -t flag (timestamp cutoff)
+
+The `adelete` command accepts a `-t YYYYMMDDHHMMSS` flag to filter by document date.
+The timestamp format is always 14 digits: year(4) month(2) day(2) hour(2) min(2) sec(2).
+
+**Behavior:**
+- `-t 20210228235959` → deletes only documents with a date **≤ 2021-02-28 23:59:59** (i.e., everything before March 2021)
+- The `-t` flag is additive: it combines with any existing flags in the command.
+
+**Examples:**
+
+Delete all content classes where DoIssue is before March 2021 (end of February 2021):
+```
+adelete -s Mobius -u ADMIN -r {CONTENT_CLASS} -c -n -y ALL -o -t 20210228235959
+```
+
+Delete all content classes where DoIssue is before January 1, 2023:
+```
+adelete -s Mobius -u ADMIN -r {CONTENT_CLASS} -c -n -y ALL -o -t 20221231235959
+```
+
+Delete all content classes where DoIssue is before January 1, 2026:
+```
+adelete -s Mobius -u ADMIN -r {CONTENT_CLASS} -c -n -y ALL -o -t 20251231235959
+```
+
+**Date calculation rule:**
+- "Before March 2021" → last second of February 2021 → `-t 20210228235959`
+- "Before 2024" → last second of December 2023 → `-t 20231231235959`
+- "Before June 2022" → last second of May 2022 → `-t 20220531235959`
+
+---
+
 ## Quick prompts for MobiusRemoteCLI adelete
 
 Use these prompts when you are editing an `adelete` template and need exact clauses.

@@ -3,8 +3,9 @@
 import json
 import re
 import time
+import asyncio
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, Awaitable, Callable
 import structlog
 from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
@@ -25,6 +26,8 @@ from app.memory.qdrant_store import (
 )
 
 logger = structlog.get_logger(__name__)
+
+ProgressCallback = Callable[[str, str, dict[str, Any] | None], Awaitable[None]]
 
 _INDEX_CATALOG_CACHE: dict[str, tuple[float, set[str]]] = {}
 _CONTENT_CLASS_CACHE: dict[str, tuple[float, set[str]]] = {}
@@ -313,15 +316,17 @@ def _direct_advisory_answer(question: str, doc_context: str) -> str:
     # context includes explicit adelete option evidence from documentation.
     evidence = doc_context.lower()
     has_adelete_options = (
-        "adelete -s" in evidence
-        and "-t" in evidence
-        and "-d" in evidence
-        and ("-trn" in evidence or "-tro" in evidence)
+        ("adelete -s" in evidence and "-t" in evidence)
+        or "-trn" in evidence
+        or "-tro" in evidence
     )
     if not has_adelete_options:
         return ""
 
     wants_clause_only = any(token in lower_q for token in ["return only the clause", "exact filter clause", "only the clause", "return the final adelete filter clause"])
+    tool_name = (context.get("tool") or "").strip().lower()
+    command_template = (context.get("command") or "").strip()
+    is_mrc_context = tool_name == "mobiusremotecli"
     clause = ""
     explanation = ""
 
@@ -339,6 +344,13 @@ def _direct_advisory_answer(question: str, doc_context: str) -> str:
     def _prev_day_end_ts(date_iso: str) -> str:
         dt = datetime.strptime(date_iso, "%Y-%m-%d") - timedelta(days=1)
         return dt.strftime("%Y%m%d") + "235959"
+
+    def _render_full_adelete_command(base_cmd: str, filter_clause: str) -> str:
+        if not base_cmd:
+            return ""
+        cleaned = re.sub(r"\s-(?:t|d|trn|tro)\s+\S+", "", base_cmd, flags=re.IGNORECASE)
+        cleaned = re.sub(r"\s+", " ", cleaned).strip()
+        return f"{cleaned} {filter_clause}".strip()
 
     if len(dates) >= 2 and "between" in lower_q:
         start_ts = _to_ts(dates[0], end_of_day=False)
@@ -387,8 +399,13 @@ def _direct_advisory_answer(question: str, doc_context: str) -> str:
     if not clause:
         return ""
 
-    if wants_clause_only:
+    if wants_clause_only and not (is_mrc_context and command_template):
         return clause
+
+    if is_mrc_context and command_template:
+        full_cmd = _render_full_adelete_command(command_template, clause)
+        if full_cmd:
+            return full_cmd
 
     if "before giving the final adelete filter" in lower_q or "before giving the final clause" in lower_q:
         return f"{explanation}\n{clause}"
@@ -419,6 +436,158 @@ def _needs_rag_fallback(answer: str) -> bool:
         "❌ error",
     ]
     return any(marker in text for marker in generic_markers)
+
+
+def _is_transient_agent_error(exc: Exception) -> bool:
+    """Heuristics for retryable agent errors."""
+    text = str(exc).lower()
+    retry_markers = [
+        "timeout",
+        "timed out",
+        "connection",
+        "temporarily unavailable",
+        "service unavailable",
+        "429",
+        "502",
+        "503",
+        "504",
+        "empty reply",
+        "connection reset",
+    ]
+    return any(marker in text for marker in retry_markers)
+
+
+async def _emit_progress(
+    progress_cb: ProgressCallback | None,
+    stage: str,
+    message: str,
+    meta: dict[str, Any] | None = None,
+) -> None:
+    """Emit a progress event if a callback is provided."""
+    if progress_cb is None:
+        return
+    try:
+        await progress_cb(stage, message, meta or {})
+    except Exception:
+        logger.warning("agent.progress.emit_failed", stage=stage)
+
+
+async def _run_with_harness(
+    *,
+    request_id: str,
+    route_name: str,
+    primary_call,
+    fallback_call=None,
+    timeout_seconds: float = 120.0,
+    fallback_timeout_seconds: float = 90.0,
+    max_attempts: int = 2,
+    retry_backoff_seconds: float = 0.25,
+    progress_cb: ProgressCallback | None = None,
+) -> dict:
+    """Execute agent route with timeout, retry and fallback safeguards."""
+    last_error: Exception | None = None
+
+    for attempt in range(1, max_attempts + 1):
+        try:
+            logger.info(
+                "agent.harness.attempt",
+                request_id=request_id,
+                route=route_name,
+                attempt=attempt,
+                timeout_seconds=timeout_seconds,
+            )
+            await _emit_progress(
+                progress_cb,
+                "harness_attempt",
+                f"Attempt {attempt}/{max_attempts} on {route_name}",
+                {"request_id": request_id, "route": route_name, "attempt": attempt, "max_attempts": max_attempts},
+            )
+            result = await asyncio.wait_for(primary_call(), timeout=timeout_seconds)
+
+            answer = (result or {}).get("answer", "") if isinstance(result, dict) else ""
+            if isinstance(answer, str) and answer.strip():
+                logger.info(
+                    "agent.harness.success",
+                    request_id=request_id,
+                    route=route_name,
+                    attempt=attempt,
+                    answer_chars=len(answer),
+                )
+                return result
+
+            raise RuntimeError("Empty answer produced by route")
+
+        except Exception as exc:
+            last_error = exc
+            transient = _is_transient_agent_error(exc)
+            logger.warning(
+                "agent.harness.failure",
+                request_id=request_id,
+                route=route_name,
+                attempt=attempt,
+                transient=transient,
+                error=str(exc),
+            )
+            if attempt < max_attempts and transient:
+                backoff = retry_backoff_seconds * attempt
+                await _emit_progress(
+                    progress_cb,
+                    "harness_retry",
+                    f"Retrying after transient error (attempt {attempt})",
+                    {
+                        "request_id": request_id,
+                        "route": route_name,
+                        "attempt": attempt,
+                        "error": str(exc),
+                        "backoff_seconds": backoff,
+                    },
+                )
+                await asyncio.sleep(backoff)
+                continue
+            break
+
+    if fallback_call is not None:
+        try:
+            logger.info("agent.harness.fallback.start", request_id=request_id, route=route_name)
+            await _emit_progress(
+                progress_cb,
+                "harness_fallback_start",
+                f"Starting fallback route for {route_name}",
+                {"request_id": request_id, "route": route_name},
+            )
+            fallback_result = await asyncio.wait_for(fallback_call(), timeout=fallback_timeout_seconds)
+            fallback_answer = (fallback_result or {}).get("answer", "") if isinstance(fallback_result, dict) else ""
+            if isinstance(fallback_answer, str) and fallback_answer.strip():
+                logger.info("agent.harness.fallback.success", request_id=request_id, route=route_name)
+                await _emit_progress(
+                    progress_cb,
+                    "harness_fallback_success",
+                    "Fallback route completed successfully",
+                    {"request_id": request_id, "route": route_name},
+                )
+                return fallback_result
+        except Exception as fallback_exc:
+            logger.error(
+                "agent.harness.fallback.failure",
+                request_id=request_id,
+                route=route_name,
+                error=str(fallback_exc),
+            )
+
+    detail = str(last_error) if last_error else "unknown error"
+    logger.error("agent.harness.give_up", request_id=request_id, route=route_name, error=detail)
+    await _emit_progress(
+        progress_cb,
+        "harness_give_up",
+        "All attempts and fallback failed",
+        {"request_id": request_id, "route": route_name, "error": detail},
+    )
+    return {
+        "answer": (
+            "I could not complete your request due to a transient processing problem. "
+            "Please retry in a few seconds."
+        )
+    }
 
 
 def _extract_json_object(raw_text: str) -> dict[str, Any]:
@@ -618,22 +787,56 @@ async def ask_agent(
     question: str,
     chat_history: list[dict] | None = None,
     user_message_content: list[dict] | None = None,
+    progress_cb: ProgressCallback | None = None,
 ) -> dict:
     """Process a user question through the appropriate agent pipeline.
     
     Routes to ContentEdge LangGraph for ContentEdge-specific questions,
     otherwise uses the general ReAct agent with all skills.
     """
-    logger.info("agent.start", question=question[:200])
-    
+    request_id = f"req_{int(time.time() * 1000)}"
+    logger.info("agent.start", request_id=request_id, question=question[:200])
+
     # Route to ContentEdge LangGraph if ContentEdge-specific question
     if _is_contentedge_question(question):
-        logger.info("routing.to_contentedge_langgraph")
-        return await _ask_contentedge_agent(question, chat_history, user_message_content)
-    
+        logger.info("routing.to_contentedge_langgraph", request_id=request_id)
+        await _emit_progress(
+            progress_cb,
+            "routing_contentedge_langgraph",
+            "Routing to ContentEdge LangGraph",
+            {"request_id": request_id},
+        )
+        return await _run_with_harness(
+            request_id=request_id,
+            route_name="contentedge_langgraph",
+            primary_call=lambda: _ask_contentedge_agent(question, chat_history, user_message_content),
+            fallback_call=lambda: _ask_general_agent(question, chat_history, user_message_content),
+            timeout_seconds=settings.agent_harness_timeout_seconds,
+            fallback_timeout_seconds=settings.agent_harness_fallback_timeout_seconds,
+            max_attempts=settings.agent_harness_max_attempts,
+            retry_backoff_seconds=settings.agent_harness_retry_backoff_seconds,
+            progress_cb=progress_cb,
+        )
+
     # Otherwise use general ReAct agent
-    logger.info("routing.to_general_react_agent")
-    return await _ask_general_agent(question, chat_history, user_message_content)
+    logger.info("routing.to_general_react_agent", request_id=request_id)
+    await _emit_progress(
+        progress_cb,
+        "routing_general_react",
+        "Routing to general ReAct agent",
+        {"request_id": request_id},
+    )
+    return await _run_with_harness(
+        request_id=request_id,
+        route_name="general_react",
+        primary_call=lambda: _ask_general_agent(question, chat_history, user_message_content),
+        fallback_call=lambda: _ask_contentedge_agent(question, chat_history, user_message_content),
+        timeout_seconds=settings.agent_harness_timeout_seconds,
+        fallback_timeout_seconds=settings.agent_harness_fallback_timeout_seconds,
+        max_attempts=settings.agent_harness_max_attempts,
+        retry_backoff_seconds=settings.agent_harness_retry_backoff_seconds,
+        progress_cb=progress_cb,
+    )
 
 
 async def _ask_contentedge_agent(
@@ -672,8 +875,8 @@ async def _ask_contentedge_agent(
             operation_confirmed=False,
         )
         
-        # Configure thread ID for conversation persistence
-        thread_config = {"configurable": {"thread_id": "contentedge_default"}}
+        # Use a per-request thread id to avoid leaking stale state across turns.
+        thread_config = {"configurable": {"thread_id": f"contentedge_{int(time.time() * 1000)}"}}
         
         # Invoke ContentEdge LangGraph
         result = await contentedge_app.ainvoke(
