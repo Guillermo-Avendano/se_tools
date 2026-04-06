@@ -696,19 +696,37 @@ class OperationPlanner:
     def _extract_operation_type(self, user_request: str) -> str:
         """Extract operation type from user request."""
         request_lower = user_request.lower()
+
+        def _has_keyword(keyword: str) -> bool:
+            # Single-word keywords should match whole words only, so "get"
+            # does not match "target".
+            if " " in keyword or "-" in keyword:
+                return keyword in request_lower
+            import re
+            return re.search(rf"\b{re.escape(keyword)}\b", request_lower) is not None
         
         operation_patterns = {
-            "list": ["list", "show", "get", "retrieve", "display"],
             "create": ["create", "generate", "add", "new", "make"],
             "delete": ["delete", "remove", "del", "destroy"],
             "export": ["export", "save", "download"],
             "import": ["import", "load", "upload"],
             "search": ["search", "find", "query", "lookup"],
-            "archive": ["archive", "store", "save"]
+            "archive": ["archive", "store", "save"],
+            "list": ["list", "show", "get", "retrieve", "display"],
         }
+
+        # Existence checks combined with an explicit create intent should still
+        # resolve to create, not list/verify.
+        if _has_keyword("create") and (
+            "if not exist" in request_lower
+            or "if it doesn't exist" in request_lower
+            or "if it does not exist" in request_lower
+            or "si no existe" in request_lower
+        ):
+            return "create"
         
         for operation, keywords in operation_patterns.items():
-            if any(keyword in request_lower for keyword in keywords):
+            if any(_has_keyword(keyword) for keyword in keywords):
                 return operation
         
         return "unknown"
