@@ -29,6 +29,7 @@ CE_ROOT = _APP_ROOT / "contentedge"
 WORKSPACE_ROOT = Path(os.environ.get("WORKSPACE_ROOT", str(_APP_ROOT.parent / "workspace")))
 DATA_ROOT = Path(os.environ.get("DATA_ROOT", "/data"))
 TMP_DIR = WORKSPACE_ROOT / "tmp"
+EXPORT_IMPORT_DIR = WORKSPACE_ROOT / "export-import"
 
 # Ensure contentedge/lib is importable
 if str(CE_ROOT) not in sys.path:
@@ -199,6 +200,87 @@ _index_admins: dict[str, ContentAdmIndex] = {}
 _ig_admins: dict[str, ContentAdmIndexGroup] = {}
 _target_cc_versions_cache: dict[str, tuple[float, list[dict]]] = {}
 _TARGET_CC_CACHE_TTL_SECONDS = 60
+
+
+def _normalize_repo_base_url(url: str) -> str:
+    """Normalize repository base URL to an absolute http(s) URL."""
+    clean = (url or "").strip()
+    if not clean:
+        return ""
+    if not clean.lower().startswith(("http://", "https://")):
+        clean = f"https://{clean}"
+    return clean.rstrip("/")
+
+
+def _probe_repo_connection(base_url: str, user: str, password: str, timeout_sec: float = 4.0) -> tuple[bool, str]:
+    """Probe repo connectivity and credentials via /repositories endpoint."""
+    if not base_url:
+        return False, "missing URL"
+    endpoints = [
+        f"{base_url}/mobius/rest/repositories",
+        f"{base_url}/repositories",
+    ]
+
+    last_reason = ""
+    for endpoint in endpoints:
+        try:
+            response = requests.get(
+                endpoint,
+                auth=(user or "", password or ""),
+                timeout=timeout_sec,
+                verify=False,
+            )
+        except requests.exceptions.RequestException as exc:
+            last_reason = str(exc)
+            continue
+
+        if 200 <= response.status_code < 300:
+            return True, "ok"
+
+        # 401/403/404 may indicate wrong endpoint/auth; try fallback endpoint.
+        last_reason = f"HTTP {response.status_code}"
+
+    return False, last_reason or "probe failed"
+
+
+def _repo_runtime_status(repo: str) -> dict:
+    """Return runtime status for source/target repos based on env + connectivity."""
+    key = repo.strip().lower()
+    is_target = key in ("target", "secondary")
+    prefix = "CE_TARGET_" if is_target else "CE_SOURCE_"
+
+    raw_url = os.environ.get(f"{prefix}REPO_URL", "")
+    url = _normalize_repo_base_url(raw_url)
+    name = os.environ.get(f"{prefix}REPO_NAME", "")
+    user = os.environ.get(f"{prefix}REPO_USER", "")
+    password = os.environ.get(f"{prefix}REPO_PASS", "")
+
+    missing = []
+    if not raw_url:
+        missing.append("REPO_URL")
+    if not name:
+        missing.append("REPO_NAME")
+    if not user:
+        missing.append("REPO_USER")
+    if not password:
+        missing.append("REPO_PASS")
+
+    configured = len(missing) == 0
+    connected = False
+    reason = ""
+    if configured:
+        connected, reason = _probe_repo_connection(url, user, password)
+    else:
+        reason = "missing: " + ", ".join(missing)
+
+    return {
+        "active": bool(configured and connected),
+        "configured": configured,
+        "connected": connected,
+        "url": raw_url,
+        "name": name,
+        "reason": reason,
+    }
 
 
 def _get_config(repo: str = "source") -> ContentConfig:
@@ -1146,6 +1228,11 @@ def _migrate_index_groups(req: MigrateRequest, results: dict):
 VDRDBXML_FILES_DIR = _APP_ROOT / "worker" / "files"
 
 
+def _vdr_timestamp() -> str:
+    """Timestamp used in vdrdbxml artifacts: YYYY-MM-DD.HH.mm.ss."""
+    return datetime.now().strftime("%Y-%m-%d.%H.%M.%S")
+
+
 def _build_selected_definitions_xml(
     content_classes: list[str],
     indexes: list[str],
@@ -1182,24 +1269,26 @@ def _build_selected_definitions_xml(
 
 @app.post("/api/migrate/prepare-xml")
 def migrate_prepare_xml(req: MigrateVdrdbxmlRequest):
-    """Prepare the vdrdbxml XML file in the worker's tasks dir and return plan steps."""
+    """Prepare timestamped vdrdbxml XML files in /workspace/export-import and return plan steps."""
     import re as _re
     import shutil
 
     safe_worker = _re.sub(r'[^a-zA-Z0-9_-]', '', req.worker)
-    tasks_dir = WORKSPACE_ROOT / safe_worker / "tasks"
-    tasks_dir.mkdir(parents=True, exist_ok=True)
+    EXPORT_IMPORT_DIR.mkdir(parents=True, exist_ok=True)
 
-    worker_base = f"/workspace/{safe_worker}/tasks"
+    ts = _vdr_timestamp()
+    base_name = f"vdrdbxml_{safe_worker}_{ts}"
+
+    worker_base = "/workspace/export-import"
 
     if req.mode == "all":
-        # Copy get_all_definitions.xml to tasks dir
+        # Copy template XML to export-import directory with timestamped filename
         src = VDRDBXML_FILES_DIR / "get_all_definitions.xml"
         if not src.is_file():
             raise HTTPException(status_code=500, detail="get_all_definitions.xml not found in image")
-        dest = tasks_dir / "get_all_definitions.xml"
+        xml_filename = f"{base_name}_get_all_definitions.xml"
+        dest = EXPORT_IMPORT_DIR / xml_filename
         shutil.copy2(str(src), str(dest))
-        xml_filename = "get_all_definitions.xml"
     elif req.mode == "specific":
         total = len(req.content_classes) + len(req.indexes) + len(req.index_groups) + len(req.archiving_policies)
         if total == 0:
@@ -1207,11 +1296,14 @@ def migrate_prepare_xml(req: MigrateVdrdbxmlRequest):
         xml_content = _build_selected_definitions_xml(
             req.content_classes, req.indexes, req.index_groups, req.archiving_policies,
         )
-        xml_filename = "get_selected_definitions.xml"
-        dest = tasks_dir / xml_filename
+        xml_filename = f"{base_name}_get_selected_definitions.xml"
+        dest = EXPORT_IMPORT_DIR / xml_filename
         dest.write_text(xml_content, encoding="utf-8")
     else:
         raise HTTPException(status_code=400, detail=f"Invalid mode: {req.mode}")
+
+    export_out_filename = f"{base_name}_export_out.xml"
+    import_out_filename = f"{base_name}_import_out.xml"
 
     # Load vdrdbxml template (use request override or env default)
     template = req.template.strip() if req.template.strip() else os.environ.get(
@@ -1233,13 +1325,15 @@ def migrate_prepare_xml(req: MigrateVdrdbxmlRequest):
         )
 
     export_cmd = _resolve(template, source_cfg,
-        f"{worker_base}/{xml_filename}", f"{worker_base}/export_out.xml")
+        f"{worker_base}/{xml_filename}", f"{worker_base}/{export_out_filename}")
     import_cmd = _resolve(template, target_cfg,
-        f"{worker_base}/export_out.xml", f"{worker_base}/import_out.xml")
+        f"{worker_base}/{export_out_filename}", f"{worker_base}/{import_out_filename}")
 
     return {
         "ok": True,
-        "xml_file": xml_filename,
+        "xml_file": f"{worker_base}/{xml_filename}",
+        "export_out_file": f"{worker_base}/{export_out_filename}",
+        "import_out_file": f"{worker_base}/{import_out_filename}",
         "steps": [
             {"repo": "SOURCE", "operation": "vdrdbxml", "command": export_cmd},
             {"repo": "TARGET", "operation": "vdrdbxml", "command": import_cmd},
@@ -1467,9 +1561,8 @@ def list_repos():
     """List available repositories (source is always available; target if configured)."""
     repos = ["source"]
     try:
-        target_prefix = "CE_TARGET_"
-        has_target = any(k.startswith(target_prefix) and v for k, v in os.environ.items())
-        if has_target:
+        status = _repo_runtime_status("target")
+        if status.get("active"):
             repos.append("target")
     except Exception:
         pass
@@ -1709,13 +1802,10 @@ def mrc_repo_config(repo: str = "source"):
 @app.get("/api/mrc/repos-status")
 def mrc_repos_status():
     """Return active status for both SOURCE and TARGET repos."""
-    result = {}
-    for r in ("source", "target"):
-        prefix = "CE_TARGET_" if r == "target" else "CE_SOURCE_"
-        url = os.environ.get(f"{prefix}REPO_URL", "")
-        name = os.environ.get(f"{prefix}REPO_NAME", "")
-        result[r] = {"active": bool(url and name), "url": url, "name": name}
-    return result
+    return {
+        "source": _repo_runtime_status("source"),
+        "target": _repo_runtime_status("target"),
+    }
 
 
 @app.get("/api/mrc/adelete-template")

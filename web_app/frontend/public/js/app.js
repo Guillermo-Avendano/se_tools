@@ -290,6 +290,8 @@ function confirmDialog(title, body) {
 async function loadRepoInfoBar() {
     try {
         const data = await API.get('/api/mrc/repos-status');
+        state.mrc.reposStatus = data;
+        applyRepoAvailability(data);
         const srcUrl = document.getElementById('repo-info-source-url');
         const srcName = document.getElementById('repo-info-source-name');
         const tgtUrl = document.getElementById('repo-info-target-url');
@@ -298,18 +300,66 @@ async function loadRepoInfoBar() {
             srcUrl.textContent = data.source.url;
             srcName.textContent = data.source.name ? `(${data.source.name})` : '';
         } else {
-            srcUrl.textContent = 'Not configured';
+            srcUrl.textContent = data.source?.configured ? 'Configured but unreachable' : 'Not configured';
             srcName.textContent = '';
         }
         if (data.target?.active) {
             tgtUrl.textContent = data.target.url;
             tgtName.textContent = data.target.name ? `(${data.target.name})` : '';
         } else {
-            tgtUrl.textContent = 'Not configured';
+            tgtUrl.textContent = data.target?.configured ? 'Configured but unreachable' : 'Not configured';
             tgtName.textContent = '';
         }
     } catch (e) {
         // silently ignore
+    }
+}
+
+function isRepoActive(repo) {
+    return !!state.mrc?.reposStatus?.[repo]?.active;
+}
+
+function applyRepoAvailability(data) {
+    const sourceActive = !!data?.source?.active;
+    const targetActive = !!data?.target?.active;
+
+    // MRC repo buttons
+    const srcBtn = document.getElementById('mrc-btn-source');
+    const tgtBtn = document.getElementById('mrc-btn-target');
+    if (srcBtn) {
+        srcBtn.disabled = !sourceActive;
+        srcBtn.title = sourceActive ? (data.source?.url || '') : (data.source?.reason || 'Not available');
+    }
+    if (tgtBtn) {
+        tgtBtn.disabled = !targetActive;
+        tgtBtn.title = targetActive ? (data.target?.url || '') : (data.target?.reason || 'Not available');
+    }
+
+    // Remove Definitions repo buttons
+    const rdSourceBtn = document.getElementById('rd-btn-source');
+    const rdTargetBtn = document.getElementById('rd-btn-target');
+    if (rdSourceBtn) rdSourceBtn.disabled = !sourceActive;
+    if (rdTargetBtn) rdTargetBtn.disabled = !targetActive;
+
+    // Workers manual plan repo selector
+    const wkRepoSelect = document.getElementById('wk-step-repo');
+    if (wkRepoSelect) {
+        const sourceOpt = Array.from(wkRepoSelect.options).find(o => o.value === 'SOURCE');
+        const targetOpt = Array.from(wkRepoSelect.options).find(o => o.value === 'TARGET');
+        if (sourceOpt) sourceOpt.disabled = !sourceActive;
+        if (targetOpt) targetOpt.disabled = !targetActive;
+        if ((!targetActive && wkRepoSelect.value === 'TARGET') || (!sourceActive && wkRepoSelect.value === 'SOURCE')) {
+            wkRepoSelect.value = sourceActive ? 'SOURCE' : (targetActive ? 'TARGET' : 'SOURCE');
+        }
+    }
+
+    // Keep selected repo valid in tools that have current selection state
+    if (state.mrc.selectedRepo && !isRepoActive(state.mrc.selectedRepo)) {
+        mrcSelectRepo(null);
+    }
+    if (!isRepoActive(state.rd.selectedRepo || 'target')) {
+        const fallbackRepo = sourceActive ? 'source' : (targetActive ? 'target' : 'source');
+        rdSelectRepo(fallbackRepo, true);
     }
 }
 
@@ -1004,14 +1054,7 @@ async function mrcLoadReposStatus() {
     try {
         const data = await API.get('/api/mrc/repos-status');
         state.mrc.reposStatus = data;
-        const srcBtn = document.getElementById('mrc-btn-source');
-        const tgtBtn = document.getElementById('mrc-btn-target');
-        srcBtn.disabled = !data.source?.active;
-        tgtBtn.disabled = !data.target?.active;
-        if (data.source?.active) srcBtn.title = data.source.url;
-        else srcBtn.title = 'Not configured';
-        if (data.target?.active) tgtBtn.title = data.target.url;
-        else tgtBtn.title = 'Not configured';
+        applyRepoAvailability(data);
         // If current selected repo became inactive, deselect
         if (state.mrc.selectedRepo === 'source' && !data.source?.active) mrcSelectRepo(null);
         if (state.mrc.selectedRepo === 'target' && !data.target?.active) mrcSelectRepo(null);
@@ -2340,14 +2383,14 @@ async function mrcVdrGeneratePlan() {
     if (dir === 'import') {
         const xmlPath = state.mrc.vdrdbxmlImportFile;
         if (!xmlPath) { showToast('Select an XML input file first', 'warning'); return; }
-        // Build output path: same dir, same base name + _out_<timestamp>.xml
+        // Build output path in /workspace/export-import with timestamped filename
+        const worker = state.mrc.selectedWorker || 'worker';
         const parts = xmlPath.replace(/\\/g, '/').split('/');
         const fileName = parts.pop();
-        const dirPath = parts.join('/');
         const baseName = fileName.replace(/\.xml$/i, '');
         const now = new Date();
-        const ts = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}.${String(now.getMinutes()).padStart(2,'0')}.${String(now.getSeconds()).padStart(2,'0')}`;
-        const outPath = `${dirPath}/${baseName}_out_${ts}.xml`;
+        const ts = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}.${String(now.getHours()).padStart(2, '0')}.${String(now.getMinutes()).padStart(2, '0')}.${String(now.getSeconds()).padStart(2, '0')}`;
+        const outPath = `/workspace/export-import/vdrdbxml_${worker}_${baseName}_import_out_${ts}.xml`;
 
         const cfg = state.mrc.acreateRepoConfig || {};
         const cmd = template
@@ -2763,7 +2806,11 @@ async function rdLoadWorkers() {
     } catch (e) { showToast('Failed to load workers: ' + e.message, 'error'); }
 }
 
-function rdSelectRepo(repo) {
+function rdSelectRepo(repo, silent = false) {
+    if (!isRepoActive(repo)) {
+        if (!silent) showToast(`Repository ${repo.toUpperCase()} is not available`, 'warning');
+        return;
+    }
     state.rd.selectedRepo = repo;
     document.querySelectorAll('.rd-repo-btn').forEach(b => b.classList.toggle('active', b.dataset.repo === repo));
     rdLoadAllCategories();
@@ -3023,6 +3070,14 @@ function wkAddStep() {
     const repo = document.getElementById('wk-step-repo').value;
     const operation = document.getElementById('wk-step-operation').value;
     const command = document.getElementById('wk-step-command').value.trim();
+    if (repo === 'TARGET' && !isRepoActive('target')) {
+        showToast('TARGET repository is not available', 'warning');
+        return;
+    }
+    if (repo === 'SOURCE' && !isRepoActive('source')) {
+        showToast('SOURCE repository is not available', 'warning');
+        return;
+    }
     if (!command) { showToast('Command is required', 'warning'); return; }
     state.wk.planSteps.push({ repo, operation, command });
     document.getElementById('wk-step-command').value = '';
