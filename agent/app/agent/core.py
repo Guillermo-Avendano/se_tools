@@ -346,21 +346,26 @@ def _direct_advisory_answer(question: str, doc_context: str) -> str:
     if repo not in ("source", "target"):
         repo = "source"
 
+    tool_name = (context.get("tool") or "").strip().lower()
+    command_template = (context.get("command") or "").strip()
+    is_mrc_context = tool_name == "mobiusremotecli"
+
     # Doc-first guardrail: only produce deterministic guidance when retrieved
     # context includes explicit adelete option evidence from documentation.
+    # Exception: when SE Tools already provides a MobiusRemoteCLI adelete
+    # command template, allow deterministic rendering without doc evidence.
     evidence = doc_context.lower()
     has_adelete_options = (
         ("adelete -s" in evidence and "-t" in evidence)
         or "-trn" in evidence
         or "-tro" in evidence
     )
+    if is_mrc_context and command_template and operation == "adelete":
+        has_adelete_options = True
     if not has_adelete_options:
         return ""
 
     wants_clause_only = any(token in lower_q for token in ["return only the clause", "exact filter clause", "only the clause", "return the final adelete filter clause"])
-    tool_name = (context.get("tool") or "").strip().lower()
-    command_template = (context.get("command") or "").strip()
-    is_mrc_context = tool_name == "mobiusremotecli"
     clause = ""
     explanation = ""
 
