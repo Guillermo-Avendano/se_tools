@@ -119,100 +119,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # ─── llama.cpp model bootstrap (optional) ───
-  llama-cpp-models-init:
-    image: curlimages/curl:8.12.1
-    restart: "no"
-    profiles: ["llama_cpp"]
-    volumes:
-      - ./workspace/llamaccp/models:/models
-    environment:
-      LLAMA_CPP_CHAT_MODEL_FILE: ${LLAMA_CPP_CHAT_MODEL_FILE:-chat.gguf}
-      LLAMA_CPP_CHAT_MODEL_URL: ${LLAMA_CPP_CHAT_MODEL_URL:-}
-      LLAMA_CPP_EMBED_MODEL_FILE: ${LLAMA_CPP_EMBED_MODEL_FILE:-embed.gguf}
-      LLAMA_CPP_EMBED_MODEL_URL: ${LLAMA_CPP_EMBED_MODEL_URL:-}
-    command:
-      - /bin/sh
-      - -lc
-      - |
-        set -eu
-        mkdir -p /models
-        dl() {
-          file="$$1"
-          url="$$2"
-          if [ -f "/models/$$file" ]; then
-            echo "[llama-cpp-init] Found /models/$$file"
-            return 0
-          fi
-          if [ -z "$$url" ]; then
-            echo "[llama-cpp-init] Missing download URL for $$file"
-            exit 1
-          fi
-          echo "[llama-cpp-init] Downloading $$file"
-          curl -fL "$$url" -o "/models/$$file.part"
-          mv "/models/$$file.part" "/models/$$file"
-          echo "[llama-cpp-init] Downloaded /models/$$file"
-        }
-        dl "$$LLAMA_CPP_CHAT_MODEL_FILE" "$$LLAMA_CPP_CHAT_MODEL_URL"
-        dl "$$LLAMA_CPP_EMBED_MODEL_FILE" "$$LLAMA_CPP_EMBED_MODEL_URL"
-
-  # ─── llama.cpp chat server (optional) ───
-  llama-cpp-chat:
-    image: ghcr.io/ggml-org/llama.cpp:server
-    restart: unless-stopped
-    profiles: ["llama_cpp"]
-    ports:
-      - "${LLAMA_CPP_CHAT_PORT:-8080}:8080"
-    volumes:
-      - ./workspace/llamaccp/models:/models
-    environment:
-      LLAMA_CPP_CHAT_MODEL_FILE: ${LLAMA_CPP_CHAT_MODEL_FILE:-chat.gguf}
-      LLAMA_CPP_N_CTX: ${LLAMA_CPP_N_CTX:-4096}
-      LLAMA_CPP_N_GPU_LAYERS: ${LLAMA_CPP_N_GPU_LAYERS:-0}
-    command:
-      - --model
-      - /models/${LLAMA_CPP_CHAT_MODEL_FILE:-chat.gguf}
-      - --host
-      - 0.0.0.0
-      - --port
-      - "8080"
-      - --ctx-size
-      - ${LLAMA_CPP_N_CTX:-4096}
-      - --n-gpu-layers
-      - ${LLAMA_CPP_N_GPU_LAYERS:-0}
-    depends_on:
-      llama-cpp-models-init:
-        condition: service_completed_successfully
-
-  # ─── llama.cpp embeddings server (optional) ───
-  llama-cpp-embed:
-    image: ghcr.io/ggml-org/llama.cpp:server
-    restart: unless-stopped
-    profiles: ["llama_cpp"]
-    ports:
-      - "${LLAMA_CPP_EMBED_PORT:-8081}:8080"
-    volumes:
-      - ./workspace/llamaccp/models:/models
-    environment:
-      LLAMA_CPP_EMBED_MODEL_FILE: ${LLAMA_CPP_EMBED_MODEL_FILE:-embed.gguf}
-      LLAMA_CPP_EMBED_N_CTX: ${LLAMA_CPP_EMBED_N_CTX:-2048}
-      LLAMA_CPP_N_GPU_LAYERS: ${LLAMA_CPP_N_GPU_LAYERS:-0}
-    command:
-      - --model
-      - /models/${LLAMA_CPP_EMBED_MODEL_FILE:-embed.gguf}
-      - --host
-      - 0.0.0.0
-      - --port
-      - "8080"
-      - --ctx-size
-      - ${LLAMA_CPP_EMBED_N_CTX:-2048}
-      - --n-gpu-layers
-      - ${LLAMA_CPP_N_GPU_LAYERS:-0}
-      - --embedding
-    depends_on:
-      llama-cpp-models-init:
-        condition: service_completed_successfully
-
   # ─── Agent API (AI agent with chat web UI) ───
   agent-api:
     image: ${SE_AGENT_IMAGE:-rocketsoftware2030/se-agent:1.0.0}
@@ -238,10 +144,10 @@ services:
       EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-ollama}
       LLAMA_CPP_API_KEY: ${LLAMA_CPP_API_KEY:-}
       LLAMA_CPP_MODEL: ${LLAMA_CPP_MODEL:-llama-3.1-8b-instruct}
-      LLAMA_CPP_BASE_URL: ${LLAMA_CPP_BASE_URL:-http://llama-cpp-chat:8080/v1}
+      LLAMA_CPP_BASE_URL: ${LLAMA_CPP_BASE_URL:-}
       LLAMA_CPP_TEMPERATURE: ${LLAMA_CPP_TEMPERATURE:-0.1}
       LLAMA_CPP_EMBED_MODEL: ${LLAMA_CPP_EMBED_MODEL:-nomic-embed-text}
-      LLAMA_CPP_EMBED_BASE_URL: ${LLAMA_CPP_EMBED_BASE_URL:-http://llama-cpp-embed:8080/v1}
+      LLAMA_CPP_EMBED_BASE_URL: ${LLAMA_CPP_EMBED_BASE_URL:-}
       LLAMA_CPP_EMBED_API_KEY: ${LLAMA_CPP_EMBED_API_KEY:-}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:8000}

@@ -26,7 +26,7 @@ REM ── Build se-ce-tools ─────────────────
 if %BUILD_CE%==1 (
     echo.
     echo Building SE ContentEdge Tools [%SE_CE_TOOLS_IMAGE%]...
-    docker build --network host -t %SE_CE_TOOLS_IMAGE% -f se_ce_tools/Dockerfile .
+    docker build --network host -t %SE_CE_TOOLS_IMAGE% -f web_app/Dockerfile .
     if errorlevel 1 (
         echo ERROR: se-ce-tools build failed
         goto :usage

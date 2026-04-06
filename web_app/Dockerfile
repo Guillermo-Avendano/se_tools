@@ -12,9 +12,9 @@
 FROM node:20-alpine AS frontend-build
 
 WORKDIR /build
-COPY se_ce_tools/frontend/package.json se_ce_tools/frontend/package-lock.json* ./
+COPY web_app/frontend/package.json web_app/frontend/package-lock.json* ./
 RUN npm ci --production
-COPY se_ce_tools/frontend/ ./
+COPY web_app/frontend/ ./
 
 # ── Stage 2: MRC tools extraction ────────────────────────────────────────
 FROM eclipse-temurin:21-jdk-jammy AS mrc-builder
@@ -26,7 +26,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends unzip dos2unix && \
     rm -rf /var/lib/apt/lists/*
 
-COPY se_ce_tools/worker/${MRC_FILE} /tmp/${MRC_FILE}
+COPY web_app/worker/${MRC_FILE} /tmp/${MRC_FILE}
 
 RUN mkdir -p ${MRC_PATH} && \
     unzip /tmp/${MRC_FILE} -d ${MRC_PATH} && \
@@ -52,14 +52,14 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Python dependencies — backend
-COPY se_ce_tools/backend/requirements.txt /app/backend/requirements.txt
+COPY web_app/backend/requirements.txt /app/backend/requirements.txt
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 
 # Python dependencies — worker
 RUN pip install --no-cache-dir pyyaml schedule
 
 # Copy backend
-COPY se_ce_tools/backend/ /app/backend/
+COPY web_app/backend/ /app/backend/
 
 # Copy shared contentedge library
 COPY contentedge/ /app/contentedge/
@@ -71,10 +71,10 @@ COPY --from=frontend-build /build/ /app/frontend/
 COPY --from=mrc-builder /app/mrc /app/mrc
 
 # Copy worker files
-COPY se_ce_tools/worker/worker.py se_ce_tools/worker/rm_definitions.py /app/worker/
-COPY se_ce_tools/worker/init_conf.sh /app/worker/init_conf.sh
+COPY web_app/worker/worker.py web_app/worker/rm_definitions.py /app/worker/
+COPY web_app/worker/init_conf.sh /app/worker/init_conf.sh
 RUN chmod +x /app/worker/init_conf.sh
-COPY se_ce_tools/worker/files/ /app/worker/files/
+COPY web_app/worker/files/ /app/worker/files/
 
 # Workspace directory (mounted at runtime)
 RUN mkdir -p /workspace/conf /workspace/tmp /workspace/exports /app/conf
@@ -115,7 +115,7 @@ stderr_logfile_maxbytes=0
 EOF
 
 # Entrypoint: decides between worker mode and web UI mode
-COPY se_ce_tools/entrypoint.sh /app/entrypoint.sh
+COPY web_app/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 3000 8500
