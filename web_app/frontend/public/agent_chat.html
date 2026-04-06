@@ -549,10 +549,10 @@
             hintBody.textContent = ctx;
 
             const PROGRESS_STEPS = [
-                { id: "step-1", title: "Sending", progress: 10, message: "📤 Enviando pregunta..." },
-                { id: "step-2", title: "Retrieving", progress: 35, message: "🔍 Recuperando contexto from Qdrant..." },
-                { id: "step-3", title: "Processing", progress: 70, message: "⚙️ Procesando con IA..." },
-                { id: "step-4", title: "Response", progress: 100, message: "✅ Finalizando respuesta..." },
+                { id: "step-1", title: "Sending", progress: 10, message: "📤 Sending question..." },
+                { id: "step-2", title: "Retrieving", progress: 35, message: "🔍 Retrieving context from Qdrant..." },
+                { id: "step-3", title: "Processing", progress: 70, message: "⚙️ Processing with AI..." },
+                { id: "step-4", title: "Response", progress: 100, message: "✅ Finalizing response..." },
             ];
 
             const STAGE_TO_PROGRESS = {
@@ -730,7 +730,7 @@
                 
                 setBusy(true);
                 startProgressAnimation();
-                setStatus("Enviando solicitud con contexto de SE Tools...");
+                setStatus("Sending request with SE Tools context...");
                 pendingBubble = renderThinkingMessage("Sending request to agent API...");
 
                 try {
@@ -739,17 +739,17 @@
 
                     clearThinkingMessage();
                     renderMessage("assistant", answer || "No response returned.");
-                    setStatus("✅ Respuesta recibida exitosamente.");
+                    setStatus("✅ Response received successfully.");
                 } catch (error) {
                     stopProgressAnimation();
                     clearThinkingMessage();
                     
                     const aborted = error && (error.name === "AbortError" || error.message === "timeout");
                     if (aborted) {
-                        renderMessage("system", "⏱️ El agente tardó demasiado en responder (120s timeout). Puedes reintentar ahora. Si el problema persiste, verifica que el servicio Ollama está activo.");
+                        renderMessage("system", "⏱️ The agent took too long to respond (120s timeout). You can retry now. If the issue persists, verify that the Ollama service is running.");
                         setStatus("Request timed out. The UI has been reset for a new query.", true);
                     } else if (error.message.includes("LLM response timed out")) {
-                        renderMessage("system", "⏱️ El LLM tardó demasiado (30s). Verifica que Ollama está respondiendo correctamente.");
+                        renderMessage("system", "⏱️ The LLM took too long (30s). Verify that Ollama is responding correctly.");
                         setStatus("LLM timeout - Ollama may be unresponsive", true);
                     } else {
                         renderMessage("system", `❌ Request failed: ${error.message}`);
