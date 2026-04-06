@@ -4,6 +4,7 @@ import json
 import re
 import time
 import asyncio
+import calendar
 from datetime import datetime, timedelta
 from typing import Any, Awaitable, Callable
 import structlog
@@ -149,6 +150,39 @@ def _extract_first_iso_date(text: str) -> str | None:
 
 def _extract_iso_dates(text: str) -> list[str]:
     return re.findall(r"\b\d{4}-\d{2}-\d{2}\b", text)
+
+
+_MONTH_NAME_TO_NUM = {
+    "january": 1, "jan": 1,
+    "february": 2, "feb": 2,
+    "march": 3, "mar": 3,
+    "april": 4, "apr": 4,
+    "may": 5,
+    "june": 6, "jun": 6,
+    "july": 7, "jul": 7,
+    "august": 8, "aug": 8,
+    "september": 9, "sep": 9, "sept": 9,
+    "october": 10, "oct": 10,
+    "november": 11, "nov": 11,
+    "december": 12, "dec": 12,
+}
+
+
+def _extract_month_year(text: str) -> tuple[int, int] | None:
+    """Extract first month-year mention like 'March 2021'. Returns (year, month)."""
+    match = re.search(
+        r"\b(" + "|".join(_MONTH_NAME_TO_NUM.keys()) + r")\s+(\d{4})\b",
+        text,
+        re.IGNORECASE,
+    )
+    if not match:
+        return None
+    month_name = match.group(1).lower()
+    year = int(match.group(2))
+    month = _MONTH_NAME_TO_NUM.get(month_name)
+    if not month:
+        return None
+    return year, month
 
 
 def _extract_filter_field(question: str, doc_context: str) -> str | None:
@@ -331,6 +365,7 @@ def _direct_advisory_answer(question: str, doc_context: str) -> str:
     explanation = ""
 
     dates = _extract_iso_dates(user_question)
+    month_year = _extract_month_year(user_question)
     field_name = _extract_filter_field(user_question, doc_context)
     index_comparison = _extract_index_comparison(user_question)
     content_classes = _extract_content_classes(user_question)
@@ -344,6 +379,12 @@ def _direct_advisory_answer(question: str, doc_context: str) -> str:
     def _prev_day_end_ts(date_iso: str) -> str:
         dt = datetime.strptime(date_iso, "%Y-%m-%d") - timedelta(days=1)
         return dt.strftime("%Y%m%d") + "235959"
+
+    def _month_start(year: int, month: int) -> datetime:
+        return datetime(year, month, 1)
+
+    def _month_end(year: int, month: int) -> datetime:
+        return datetime(year, month, calendar.monthrange(year, month)[1])
 
     def _render_full_adelete_command(base_cmd: str, filter_clause: str) -> str:
         if not base_cmd:
@@ -381,6 +422,33 @@ def _direct_advisory_answer(question: str, doc_context: str) -> str:
         elif any(token in lower_q for token in ["date", "timestamp"]):
             clause = f"-t {_to_ts(date_value, end_of_day=True)}"
             explanation = "Default date cut-off with -t (equal-to-or-older behavior)."
+    elif month_year:
+        year, month = month_year
+        month_start = _month_start(year, month)
+        month_end = _month_end(year, month)
+        if any(token in lower_q for token in ["before", "older than", "prior to"]):
+            cutoff = month_start - timedelta(days=1)
+            clause = f"-t {cutoff.strftime('%Y%m%d')}235959"
+            explanation = (
+                "For strictly before that month, use -t with the previous day 23:59:59 "
+                "before month start."
+            )
+        elif any(token in lower_q for token in ["on or before"]):
+            clause = f"-t {month_end.strftime('%Y%m%d')}235959"
+            explanation = "Use -t at month end to include that full month."
+        elif any(token in lower_q for token in ["on or after", "after or on"]) or ">=" in user_question:
+            clause = f"-TRN {month_start.strftime('%Y%m%d')}000000"
+            explanation = "Use -TRN at month start for on-or-after month filtering."
+        elif any(token in lower_q for token in ["after", "newer than"]) or ">" in user_question:
+            if month == 12:
+                next_month_start = datetime(year + 1, 1, 1)
+            else:
+                next_month_start = datetime(year, month + 1, 1)
+            clause = f"-TRN {next_month_start.strftime('%Y%m%d')}000000"
+            explanation = "For strictly after that month, start from next month using -TRN."
+        else:
+            clause = f"-t {month_end.strftime('%Y%m%d')}235959"
+            explanation = "Default month cut-off uses -t at the end of that month."
     elif index_comparison:
         return (
             "The adelete options documented in the PDF (p.434+) are timestamp/retention based "
